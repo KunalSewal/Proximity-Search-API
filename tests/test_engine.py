@@ -205,3 +205,17 @@ def test_unreachable_candidates_are_excluded(real):
 def test_default_graph_is_full_grid(real):
     g = GraphCache(real).default
     assert g.edges == 2 * 100 * 99
+
+
+def test_lazy_and_eager_candidate_modes_agree(real):
+    with open(os.path.join(ROOT, "links", "link.txt")) as fh:
+        g = build_graph(real, fh.read())
+    rng = random.Random(5)
+    for _ in range(60):
+        lat, lon = rng.random(), rng.random()
+        cat = rng.choice(real.categories)
+        rad = rng.choice([0.03, 0.1, 0.3, 0.8, 2.0])
+        eager = [h.index for h in search(real, g, lat, lon, cat, rad, 10, lazy=False)[0]]
+        lazy = [h.index for h in search(real, g, lat, lon, cat, rad, 10, lazy=True)[0]]
+        auto = [h.index for h in search(real, g, lat, lon, cat, rad, 10)[0]]
+        assert eager == lazy == auto

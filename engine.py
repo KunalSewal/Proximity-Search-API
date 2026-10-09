@@ -313,20 +313,51 @@ class Hit:
     hops: int
 
 
-def search(ds: Dataset, graph: Graph, lat: float, lon: float, category: str | None,
-           rad: float, k: int = 10) -> tuple[list[Hit], dict]:
-    source = ds.nearest(lat, lon)
-    candidates = ds.within_radius(lat, lon, rad, category)
-    info = {"source_index": source, "candidates_in_radius": len(candidates), "settled_nodes": 0}
+class _LazyCandidates:
+    """Radius/category test done per node as Dijkstra settles it. Used when the radius
+    circle holds so many points that listing them up front would dominate the query."""
 
-    if not candidates:
+    def __init__(self, ds: Dataset, lat: float, lon: float, rad: float, category: str | None):
+        self.ds, self.lat, self.lon, self.rad, self.cat = ds, lat, lon, rad, category
+
+    def __contains__(self, i: int) -> bool:
+        ds = self.ds
+        if self.cat and ds.cat[i] != self.cat:
+            return False
+        return math.hypot(ds.lat[i] - self.lat, ds.lon[i] - self.lon) <= self.rad + EPS
+
+    def __getitem__(self, i: int) -> float:
+        return math.hypot(self.ds.lat[i] - self.lat, self.ds.lon[i] - self.lon)
+
+
+
+EAGER_CELL_LIMIT = 4096
+
+
+def search(ds: Dataset, graph: Graph, lat: float, lon: float, category: str | None,
+           rad: float, k: int = 10, lazy: bool | None = None) -> tuple[list[Hit], dict]:
+    source = ds.nearest(lat, lon)
+    euclid_only = graph.edges == 0 and graph.source == "euclidean-fallback"
+    if lazy is None:
+        # Bucket cells covered by the radius' bounding box ~ points to scan eagerly.
+        side = min(2 * rad, ds.max_lat - ds.min_lat + ds.cell, ds.max_lon - ds.min_lon + ds.cell)
+        lazy = not euclid_only and (side / ds.cell + 1) ** 2 > EAGER_CELL_LIMIT
+    if lazy:
+        candidates = _LazyCandidates(ds, lat, lon, rad, category)
+    else:
+        candidates = ds.within_radius(lat, lon, rad, category)
+    info = {"source_index": source, "candidates_in_radius": None if lazy else len(candidates),
+            "settled_nodes": 0, "mode": "lazy" if lazy else "eager"}
+
+    if not lazy and not candidates:
         return [], info
 
-    if graph.edges == 0 and graph.source == "euclidean-fallback":
+    if euclid_only:
         hits = [Hit(i, d, d, 0) for i, d in candidates.items()]
         hits.sort(key=lambda h: (h.euclidean_distance, ds.ids[h.index]))
         return hits[:k], info
 
+    total = None if lazy else len(candidates)  # unknown up front in lazy mode
     adj = graph.adj
     dist = {source: 0.0}
     hops = {source: 0}
@@ -345,7 +376,7 @@ def search(ds: Dataset, graph: Graph, lat: float, lon: float, category: str | No
             found.append(Hit(u, d, candidates[u], hops[u]))
             if len(found) == k:
                 kth = d
-            if len(found) == len(candidates):
+            if len(found) == total:  # every in-radius candidate already found
                 break
         for v, w in adj[u]:
             nd = d + w

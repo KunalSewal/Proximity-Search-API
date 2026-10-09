@@ -1,0 +1,186 @@
+{
+ "dataset": {
+  "n": 10000,
+  "rows": 100,
+  "cols": 100,
+  "spacing": 0.010101,
+  "categories": {
+   "bank": 1250,
+   "store": 1250,
+   "pharmacy": 1250,
+   "hospital": 1250,
+   "school": 1250,
+   "restaurant": 1250,
+   "park": 1250,
+   "cafe": 1250
+  }
+ },
+ "links": {
+  "edges": 14800,
+  "possible": 19800,
+  "missing": 5000,
+  "missing_pct": 25.3,
+  "horizontal": 7389,
+  "vertical": 7411,
+  "degree_hist": {
+   "1": 111,
+   "2": 2601,
+   "3": 4865,
+   "4": 2423
+  },
+  "mean_degree": 2.96,
+  "components": 1,
+  "largest_component": 10000,
+  "isolated_nodes": 0,
+  "small_components": []
+ },
+ "euclid_vs_network": {
+  "queries": 1812,
+  "mean_overlap": 8.83,
+  "overlap_hist": {
+   "3": 1,
+   "4": 2,
+   "5": 7,
+   "6": 21,
+   "7": 112,
+   "8": 431,
+   "9": 782,
+   "10": 456
+  },
+  "identical_order_pct": 1.4,
+  "identical_set_pct": 25.2,
+  "tie_at_cutoff_pct": 59.5,
+  "median_tied_group": 4.0,
+  "detour_mean": 1.21,
+  "detour_gt1_pct": 28.5,
+  "detour_max": 9.0
+ },
+ "example_query": {
+  "lat": 0.786,
+  "long": 0.485,
+  "cat": "pharmacy",
+  "rad": 0.08,
+  "start_id": 7849,
+  "network_ids": [
+   7750,
+   8051,
+   8250,
+   8052,
+   7953,
+   7948,
+   8148,
+   7845,
+   8350,
+   7754
+  ],
+  "euclid_ids": [
+   7750,
+   7948,
+   7947,
+   8051,
+   8148,
+   8052,
+   7449,
+   7448,
+   7845,
+   7745
+  ],
+  "network_hops": [
+   2,
+   4,
+   5,
+   5,
+   5,
+   6,
+   6,
+   6,
+   6,
+   6
+  ],
+  "euclid_dist": [
+   0.0129,
+   0.0298,
+   0.0434,
+   0.0374,
+   0.042,
+   0.0158,
+   0.0338,
+   0.0406,
+   0.0533,
+   0.051
+  ],
+  "overlap": 6,
+  "candidates": 31,
+  "settled": 54
+ },
+ "build_ms": 257.0,
+ "offline_timing": {
+  "ours_median_ms": 0.537,
+  "ours_p95_ms": 1.742,
+  "ours_max_ms": 4.06,
+  "settled_median": 87.0,
+  "settled_p95": 140,
+  "settled_max": 393,
+  "baseline_median_ms": 40.38,
+  "baseline_p95_ms": 58.39,
+  "baseline_agree": "150/150",
+  "speedup_median": 75.2
+ },
+ "live": {
+  "url": "http://10.1.75.53:3265/search/",
+  "get_median_ms": 19.2,
+  "get_p95_ms": 41.3,
+  "agree": "100/100",
+  "upload_median_ms": 47.0,
+  "upload_p95_ms": 64.3,
+  "upload_server_ms_median": 31.5,
+  "upload_bytes": 532800,
+  "burst_requests": 400,
+  "burst_concurrency": 16,
+  "burst_wall_s": 6.28,
+  "burst_rps": 63.7,
+  "burst_p95_ms": 404.1
+ },
+ "scaling": [
+  {
+   "side": 100,
+   "n": 10000,
+   "edges": 14897,
+   "load_s": 0.07,
+   "build_s": 0.09,
+   "ours_median_ms": 0.287,
+   "ours_p95_ms": 0.839,
+   "full_dijkstra_median_ms": 11.4
+  },
+  {
+   "side": 200,
+   "n": 40000,
+   "edges": 59699,
+   "load_s": 0.34,
+   "build_s": 0.39,
+   "ours_median_ms": 0.194,
+   "ours_p95_ms": 0.853,
+   "full_dijkstra_median_ms": 60.7
+  },
+  {
+   "side": 316,
+   "n": 99856,
+   "edges": 149354,
+   "load_s": 1.29,
+   "build_s": 1.87,
+   "ours_median_ms": 0.316,
+   "ours_p95_ms": 0.868,
+   "full_dijkstra_median_ms": 242.2
+  },
+  {
+   "side": 500,
+   "n": 250000,
+   "edges": 373956,
+   "load_s": 4.41,
+   "build_s": 5.67,
+   "ours_median_ms": 0.408,
+   "ours_p95_ms": 2.311,
+   "full_dijkstra_median_ms": 667.6
+  }
+ ]
+}
