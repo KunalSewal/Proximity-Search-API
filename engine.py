@@ -41,6 +41,7 @@ class Dataset:
         self.cat = cats
         self.n = len(ids)
         self.index_of = {loc_id: i for i, loc_id in enumerate(ids)}
+        self.coord_index = {(round(la, 6), round(lo, 6)): i for i, (la, lo) in enumerate(zip(lats, lons))}
         self.categories = sorted(set(cats))
         self.by_category: dict[str, list[int]] = {}
         for i, c in enumerate(cats):
@@ -155,63 +156,93 @@ _TOKEN_SPLIT = re.compile(r"[\s,;|]+")
 class Graph:
     adj: list[list[tuple[int, float]]]
     edges: int
+    link_format: str = "none"
     ignored_lines: int = 0
-    unknown_ids: int = 0
+    unknown_endpoints: int = 0
+    snapped_endpoints: int = 0
     index_base: int = 1
     source: str = "link-file"
     fingerprint: str = ""
     extra: dict = field(default_factory=dict)
 
 
-def parse_link_pairs(text: str) -> tuple[list[tuple[int, int]], int]:
-    """Extract (a, b) integer pairs from a link file. Tolerates commas, tabs,
-    headers and blank lines. Returns (pairs, number_of_ignored_lines)."""
-    pairs, ignored = [], 0
+def parse_links(text: str):
+    """Parse a link file. Two layouts are recognised (decided per file, by majority):
+
+      coordinates:  Longitude_A Latitude_A Longitude_B Latitude_B   (official format)
+      ids:          ID_A ID_B
+
+    Commas/tabs/semicolons as separators, headers, comments and blank lines are tolerated.
+    Returns (format, links, ignored_lines) where each link is
+      ((lat_a, lon_a), (lat_b, lon_b))   for "coordinates"
+      (id_a, id_b)                       for "ids"
+    """
+    rows = []
     for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
         nums = []
         for tok in _TOKEN_SPLIT.split(line):
-            if not tok:
-                continue
-            try:
-                f = float(tok)
-            except ValueError:
-                continue
-            if f.is_integer():
-                nums.append(int(f))
-            if len(nums) == 2:
-                break
-        if len(nums) == 2:
-            pairs.append((nums[0], nums[1]))
+            if tok:
+                try:
+                    nums.append(float(tok))
+                except ValueError:
+                    pass
+        rows.append(nums)
+
+    n_coord = sum(1 for r in rows if len(r) >= 4)
+    n_ids = sum(1 for r in rows if len(r) in (2, 3) and r[0].is_integer() and r[1].is_integer())
+    fmt = "coordinates" if n_coord >= n_ids else "ids"
+
+    links, ignored = [], 0
+    for r in rows:
+        if fmt == "coordinates" and len(r) >= 4:
+            lon_a, lat_a, lon_b, lat_b = r[:4]
+            links.append(((lat_a, lon_a), (lat_b, lon_b)))
+        elif fmt == "ids" and len(r) >= 2 and r[0].is_integer() and r[1].is_integer():
+            links.append((int(r[0]), int(r[1])))
         else:
             ignored += 1
-    return pairs, ignored
+    return fmt, links, ignored
 
 
 def build_graph(ds: Dataset, text: str) -> Graph:
-    pairs, ignored = parse_link_pairs(text)
-    if not pairs:
-        raise ValueError("link file contained no valid 'a b' pairs")
+    fmt, links, ignored = parse_links(text)
+    if not links:
+        raise ValueError("link file contained no valid links; expected lines like "
+                         "'Longitude_A Latitude_A Longitude_B Latitude_B'")
 
-    # IDs in the CSV are 1-based. If the link file uses 0..N-1 instead, shift it.
-    ids_seen = {v for p in pairs for v in p}
+    unknown = snapped = 0
     base = 1
-    if 0 in ids_seen and 0 not in ds.index_of and max(ids_seen) + 1 in ds.index_of:
-        base = 0
+    endpoints: list[tuple[int | None, int | None]] = []
+    if fmt == "coordinates":
+        def node(lat, lon):
+            nonlocal unknown, snapped
+            i = ds.coord_index.get((round(lat, 6), round(lon, 6)))
+            if i is not None:
+                return i
+            i = ds.nearest(lat, lon)  # tolerate rounding differences in the file
+            if math.hypot(ds.lat[i] - lat, ds.lon[i] - lon) <= ds.cell / 2:
+                snapped += 1
+                return i
+            unknown += 1
+            return None
+        endpoints = [(node(*a), node(*b)) for a, b in links]
+    else:
+        # IDs in the CSV are 1-based. If the link file uses 0..N-1 instead, shift it.
+        ids_seen = {v for p in links for v in p}
+        if 0 in ids_seen and 0 not in ds.index_of and max(ids_seen) + 1 in ds.index_of:
+            base = 0
+        for a, b in links:
+            ia, ib = ds.index_of.get(a + 1 - base), ds.index_of.get(b + 1 - base)
+            unknown += (ia is None) + (ib is None)
+            endpoints.append((ia, ib))
 
     adj: list[list[tuple[int, float]]] = [[] for _ in range(ds.n)]
     seen = set()
-    unknown = 0
-    for a, b in pairs:
-        if base == 0:
-            a, b = a + 1, b + 1
-        ia, ib = ds.index_of.get(a), ds.index_of.get(b)
-        if ia is None or ib is None:
-            unknown += 1
-            continue
-        if ia == ib:
+    for ia, ib in endpoints:
+        if ia is None or ib is None or ia == ib:
             continue
         key = (ia, ib) if ia < ib else (ib, ia)
         if key in seen:
@@ -220,8 +251,9 @@ def build_graph(ds: Dataset, text: str) -> Graph:
         w = ds.edge_length(ia, ib)
         adj[ia].append((ib, w))  # roads are two-way
         adj[ib].append((ia, w))
-    return Graph(adj=adj, edges=len(seen), ignored_lines=ignored, unknown_ids=unknown,
-                 index_base=base, source="link-file")
+    return Graph(adj=adj, edges=len(seen), link_format=fmt, ignored_lines=ignored,
+                 unknown_endpoints=unknown, snapped_endpoints=snapped, index_base=base,
+                 source="link-file")
 
 
 def build_full_grid_graph(ds: Dataset) -> Graph:

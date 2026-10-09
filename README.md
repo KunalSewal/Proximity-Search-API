@@ -17,12 +17,16 @@ Dataset: `data/locations.csv`, 10,000 locations (`ID, Latitude, Longitude, Categ
 | `long` | current longitude                                                          |
 | `cat`  | category (`bank, cafe, hospital, park, pharmacy, restaurant, school, store`; case-insensitive) |
 | `rad`  | search radius, as a straight-line distance in the same units as lat/long (optional, default ∞) |
-| `link` | road linkage `.txt`: one `a b` pair per line, where `a`, `b` are location IDs |
+| `link` | road linkage `.txt`, one road per line: `Longitude_A Latitude_A Longitude_B Latitude_B` |
+
+Each link joins two neighbouring grid points (horizontal or vertical, no diagonals). Note
+that **longitude comes first** on each line. The provided `links/link.txt` contains 14,800 of
+the 19,800 possible grid roads. A plain `ID_A ID_B` layout is also detected automatically.
 
 `link` can be sent in any of these forms:
 
-* a multipart file upload: `-F link=@links.txt` (a single file under any other field name also works)
-* inline text in the field: `link="1 2\n2 3\n..."`
+* a multipart file upload: `-F link=@link.txt` (a single file under any other field name also works)
+* inline text in the field: `link="0.000000 0.000000 0.010101 0.000000\n..."`
 * an `http(s)://` URL that points to the txt file
 * the name of a file that is already in `./links/` on the server
 
@@ -32,14 +36,14 @@ If you send no link information, the API assumes every lattice neighbour is conn
 
 ```bash
 curl -X POST http://10.1.75.53:8265/search/ \
-  -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@links/sample_links.txt
+  -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@links/link.txt
 ```
 
 ```python
 import requests
 r = requests.post("http://10.1.75.53:8265/search/",
                   data={"lat": 0.5, "long": 0.5, "cat": "cafe", "rad": 0.2},
-                  files={"link": open("links/sample_links.txt", "rb")})
+                  files={"link": open("links/link.txt", "rb")})
 print(r.json()["ids"])
 ```
 
@@ -47,15 +51,15 @@ print(r.json()["ids"])
 
 ```json
 {
-  "ids": [4949, 5051, 4751, 4748, 5047, 5053, 5149, 4551, 4653, 5045],
+  "ids": [4949, 5051, 5149, 4751, 4748, 5047, 5053, 5251, 4551, 4653],
   "count": 10,
   "results": [
     {"rank": 1, "id": 4949, "lat": 0.494949, "long": 0.484848, "category": "cafe",
      "grid_distance": 0.010101, "euclidean_distance": 0.015972, "hops": 1}
   ],
   "query": {"lat": 0.5, "long": 0.5, "cat": "cafe", "rad": 0.2, "k": 10},
-  "meta": {"start_node": {"id": 4950}, "link_source": "upload:sample_links.txt",
-           "edges": 13870, "candidates_in_radius": 149, "nodes_settled": 64, "time_ms": 0.9}
+  "meta": {"start_node": {"id": 4950}, "link_source": "upload:link.txt", "link_format": "coordinates",
+           "edges": 14800, "candidates_in_radius": 149, "nodes_settled": 65, "time_ms": 0.9}
 }
 ```
 
@@ -68,10 +72,12 @@ print(r.json()["ids"])
 2. **Filter by radius.** Keep locations of category `cat` whose Euclidean distance from
    (`lat`, `long`) is ≤ `rad`. Only the bucket cells that overlap the radius's bounding box
    are scanned.
-3. **Build the road graph** from the link file as an undirected adjacency list. Each edge's
+3. **Build the road graph** from the link file as an undirected adjacency list. Each
+   `lon lat lon lat` endpoint is mapped to its location by an exact coordinate lookup; values
+   with small rounding differences are snapped to the nearest location. Each edge's
    weight is the Euclidean length of the road segment, so path length equals actual travel
-   distance (an adjacent grid step is 1/99). Duplicate pairs and self-loops are ignored. A
-   0-based link file (IDs `0..N-1`) is detected and shifted. Parsed graphs are cached
+   distance (an adjacent grid step is 1/99). Duplicate links and self-loops are ignored.
+   Parsed graphs are cached
    (LRU, keyed by the SHA-256 of the file), so repeated queries with the same file skip parsing.
 4. **Dijkstra with early termination** from the start node. A location counts as a result
    when it is settled and is also a radius candidate. The search stops once 10 results are
@@ -89,7 +95,7 @@ On the 10k dataset, a query settles roughly 50–100 nodes and runs in about 1 m
 app.py               Flask API (input handling, response format)
 engine.py            dataset, spatial index, link parsing, graph, Dijkstra search
 data/locations.csv   dataset
-links/               sample link files (full grid, 30% of roads removed)
+links/               link.txt (provided), full_grid.txt, sample_links.txt (25% of roads removed)
 tools/make_links.py  generate link files with random missing roads
 tests/               correctness tests (Floyd-Warshall / exhaustive-Dijkstra references) + API tests
 start.sh             create venv, install deps, run gunicorn
@@ -102,5 +108,5 @@ start.sh             create venv, install deps, run gunicorn
 PORT=5000 ./start.sh        # different port
 python app.py               # Flask dev server (PORT env var, default 8000)
 python -m pytest -q         # tests
-python tools/make_links.py --drop 0.3 --seed 7 -o links/my_links.txt
+python tools/make_links.py --drop 0.25 --seed 7 -o links/my_links.txt
 ```

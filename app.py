@@ -5,11 +5,16 @@ Proximity Search API
     GET       /health
     GET       /
 
-`link` (road linkage, one "a b" pair per line) can be supplied as
-  * a multipart file upload            ->  -F "link=@links.txt"
-  * raw text in the field              ->  link="1 2\n2 3\n..."
-  * an http(s) URL to the txt file     ->  link=http://host/links.txt
-  * the name of a file in ./links/     ->  link=links.txt
+`link` is the road-linkage txt file. Each line is one road between two
+neighbouring grid points:
+
+    Longitude_A Latitude_A Longitude_B Latitude_B
+
+(a plain "ID_A ID_B" layout is also recognised). It can be supplied as
+  * a multipart file upload            ->  -F "link=@link.txt"
+  * raw text in the field              ->  link="0.0 0.0 0.010101 0.0\n..."
+  * an http(s) URL to the txt file     ->  link=http://host/link.txt
+  * the name of a file in ./links/     ->  link=link.txt
 If no link info is sent, every grid neighbour is assumed to be connected.
 """
 
@@ -175,9 +180,10 @@ def search_endpoint():
             "link_source": link_source,
             "graph": graph.source,
             "edges": graph.edges,
-            "link_index_base": graph.index_base,
+            "link_format": graph.link_format,
             "link_lines_ignored": graph.ignored_lines,
-            "link_pairs_unknown_ids": graph.unknown_ids,
+            "link_endpoints_snapped": graph.snapped_endpoints,
+            "link_endpoints_unknown": graph.unknown_endpoints,
             "candidates_in_radius": info["candidates_in_radius"],
             "nodes_settled": info["settled_nodes"],
             "time_ms": round((time.perf_counter() - t0) * 1000, 2),
@@ -200,8 +206,9 @@ def index():
     return jsonify({
         "service": "Proximity Search API",
         "usage": "GET or POST /search/ with fields lat, long, cat, rad, link",
-        "link": "multipart file upload, inline 'a b' lines, http(s) URL, or filename in ./links/",
-        "example": "curl -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@links.txt http://HOST:PORT/search/",
+        "link": "txt with lines 'Longitude_A Latitude_A Longitude_B Latitude_B'; send as multipart file "
+                "upload, inline text, http(s) URL, or filename in ./links/",
+        "example": "curl -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@link.txt http://HOST:PORT/search/",
         "categories": DATASET.categories,
     })
 
