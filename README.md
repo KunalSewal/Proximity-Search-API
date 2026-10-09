@@ -35,13 +35,13 @@ If you send no link information, the API assumes every lattice neighbour is conn
 ### Example
 
 ```bash
-curl -X POST http://10.1.75.53:8265/search/ \
+curl -X POST http://10.1.75.53:3265/search/ \
   -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@links/link.txt
 ```
 
 ```python
 import requests
-r = requests.post("http://10.1.75.53:8265/search/",
+r = requests.post("http://10.1.75.53:3265/search/",
                   data={"lat": 0.5, "long": 0.5, "cat": "cafe", "rad": 0.2},
                   files={"link": open("links/link.txt", "rb")})
 print(r.json()["ids"])
