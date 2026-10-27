@@ -1,0 +1,4 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ export MSYS_NO_PATHCONV=1; docker compose exec gateway wc -l /var/log/nginx/gateway_access.log
+3 /var/log/nginx/gateway_access.log
+[exit 0]

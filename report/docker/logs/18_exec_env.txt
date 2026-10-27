@@ -1,0 +1,16 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose exec api sh -c 'whoami; id; env | grep -E "^(PORT|WORKERS|THREADS|LOCATIONS_CSV|LINKS_DIR)=" | sort; ls -l /app'
+appuser
+uid=10001(appuser) gid=999(appuser) groups=999(appuser)
+LINKS_DIR=/app/links
+LOCATIONS_CSV=/app/data/locations.csv
+PORT=8000
+THREADS=2
+WORKERS=4
+total 32
+-rwxr-xr-x 1 root root  7533 Oct  9 16:21 app.py
+drwxr-xr-x 2 root root  4096 Oct  9 15:56 data
+-rwxr-xr-x 1 root root 15794 Oct  9 17:38 engine.py
+-rwxr-xr-x 1 root root   292 Oct 27 15:51 gunicorn.conf.py
+drwxrwxrwx 1 root root   512 Oct  9 16:21 links
+[exit 0]

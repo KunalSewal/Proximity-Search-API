@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ curl -s http://localhost:8080/health; echo; curl -s http://localhost:8080/gateway-health
+{"status":"ok","locations":10000,"categories":["bank","cafe","hospital","park","pharmacy","restaurant","school","store"],"grid":[100,100]}
+
+ok
+[exit 0]

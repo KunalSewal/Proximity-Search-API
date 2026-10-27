@@ -1,0 +1,115 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker build --progress=plain --target test -t proximity-api:test .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.02kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 1.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 300B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 739B done
+#4 DONE 0.0s
+
+#5 [builder 1/4] FROM docker.io/library/python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f
+#5 resolve docker.io/library/python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f 0.0s done
+#5 CACHED
+
+#6 [builder 2/4] RUN python -m venv /opt/venv
+#6 DONE 2.1s
+
+#7 [builder 3/4] COPY requirements.txt .
+#7 DONE 0.1s
+
+#8 [builder 4/4] RUN pip install -r requirements.txt
+#8 18.57 Collecting flask>=2.2 (from -r requirements.txt (line 1))
+#8 20.64   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+#8 21.72 Collecting gunicorn>=20.1 (from -r requirements.txt (line 2))
+#8 21.76   Downloading gunicorn-26.2.0-py3-none-any.whl.metadata (5.5 kB)
+#8 22.41 Collecting blinker>=1.9.0 (from flask>=2.2->-r requirements.txt (line 1))
+#8 22.46   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#8 24.29 Collecting click>=8.1.3 (from flask>=2.2->-r requirements.txt (line 1))
+#8 24.32   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#8 26.46 Collecting itsdangerous>=2.2.0 (from flask>=2.2->-r requirements.txt (line 1))
+#8 26.57   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#8 28.08 Collecting jinja2>=3.1.2 (from flask>=2.2->-r requirements.txt (line 1))
+#8 28.17   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#8 37.17 Collecting markupsafe>=2.1.1 (from flask>=2.2->-r requirements.txt (line 1))
+#8 37.21   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#8 38.88 Collecting werkzeug>=3.1.0 (from flask>=2.2->-r requirements.txt (line 1))
+#8 39.48   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+#8 39.58 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#8 49.54 Downloading gunicorn-26.2.0-py3-none-any.whl (228 kB)
+#8 139.1 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#8 139.7 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#8 183.6 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#8 187.3 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#8 203.3 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#8 203.4 Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+#8 223.1 Installing collected packages: markupsafe, itsdangerous, gunicorn, click, blinker, werkzeug, jinja2, flask
+#8 223.6 Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.3 gunicorn-26.2.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 werkzeug-3.1.9
+#8 DONE 223.6s
+
+#9 [runtime 2/7] RUN useradd --system --uid 10001 --no-create-home appuser
+#9 CACHED
+
+#10 [runtime 3/7] WORKDIR /app
+#10 CACHED
+
+#11 [runtime 4/7] COPY --from=builder /opt/venv /opt/venv
+#11 DONE 0.1s
+
+#12 [runtime 5/7] COPY app.py engine.py gunicorn.conf.py ./
+#12 DONE 0.1s
+
+#13 [runtime 6/7] COPY data/ data/
+#13 DONE 0.1s
+
+#14 [runtime 7/7] COPY links/ links/
+#14 DONE 0.0s
+
+#15 [test 1/2] RUN PIP_DEFAULT_TIMEOUT=120 PIP_RETRIES=10 pip install --no-cache-dir pytest
+#15 1.797 Collecting pytest
+#15 2.339   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+#15 3.803 Collecting iniconfig>=1.0.1 (from pytest)
+#15 4.051   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+#15 5.562 Collecting packaging>=22 (from pytest)
+#15 6.174   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+#15 7.325 Collecting pluggy<2,>=1.5 (from pytest)
+#15 7.402   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+#15 17.04 Collecting pygments>=2.7.2 (from pytest)
+#15 17.18   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+#15 18.43 Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+#15 57.41 Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+#15 57.76 Downloading packaging-26.3-py3-none-any.whl (129 kB)
+#15 73.33 Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+#15 76.49 Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+#15 219.7    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 8.0 kB/s eta 0:00:00
+#15 219.8 Installing collected packages: pygments, pluggy, packaging, iniconfig, pytest
+#15 220.4 Successfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.1.1
+#15 221.6 
+#15 221.6 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#15 221.6 [notice] To update, run: pip install --upgrade pip
+#15 DONE 221.7s
+
+#16 [test 2/2] COPY tests/ tests/
+#16 DONE 0.0s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.7s done
+#17 exporting manifest sha256:eb0dd9b840f53ffcf984c316fe67c99cb3d659a38cec9cb3809c7b7033056820 done
+#17 exporting config sha256:5dbabe2640b96b1c64f4f7a3d51a35ca31cc61042efb2d58339e0524786d17a6 0.0s done
+#17 exporting attestation manifest sha256:c19629cde95fe5f9480b000406d46b2373d7b97391307176d913c3b4ccfe7ea0 0.0s done
+#17 exporting manifest list sha256:fc773dae9a3630d62fec379d04db5d7db24586580b292177c315f103f45cf86d done
+#17 naming to docker.io/library/proximity-api:test done
+#17 unpacking to docker.io/library/proximity-api:test
+#17 unpacking to docker.io/library/proximity-api:test 0.4s done
+#17 DONE 1.2s
+[exit 0]

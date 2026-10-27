@@ -1,0 +1,8 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker run --rm hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+docker: failed to copy: httpReadSeeker: failed open: failed to do request: Get "https://production.cloudfront.docker.com/registry-v2/docker/registry/v2/blobs/sha256/e2/e2ac70e7319a02c5a477f5825259bd118b94e8b02c279c67afa63adab6d8685b/data?Expires=1793123105&Signature=eIVMaaam7eqELKli5tWH4l4K3VVKK1sQy15sGgl0aja4T3OZY1NoXus-4JbcZt9Wczdpxjs97CbiO6hx3YGaDu1x-UCp18uk23LGtnLUGyrSbLimbmcL3SMK370p7UxzQf4~0eeGiosvhxrRCTXuwRDlPt~z6cPBvp-FhULtjFHmX6uZq6-ZhEaVUlLm9OReJV9oOnz1MtUpSx9uzEbY3pLrmRsHmAB5VNwIb16-X3lYtydC59~r7aGEgunZHMzwQb9M9-HxCX0e5vRpjkcBAHw93f~GnEDUeD1DZL5H0yJYBC-x39KfdmceObjC9q~YOrsOLqmya8abflATe37bYw__&Key-Pair-Id=K31B9XRZB58O8Z": EOF
+
+Run 'docker run --help' for more information
+[exit 125]

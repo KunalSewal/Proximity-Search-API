@@ -1,0 +1,19 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ time docker compose up -d 2>&1
+ Network proximity-search_proxnet  Creating
+ Network proximity-search_proxnet  Created
+ Container proximity-search-api-1  Creating
+ Container proximity-search-api-1  Created
+ Container proximity-search-gateway-1  Creating
+ Container proximity-search-gateway-1  Created
+ Container proximity-search-api-1  Starting
+ Container proximity-search-api-1  Started
+ Container proximity-search-api-1  Waiting
+ Container proximity-search-api-1  Healthy
+ Container proximity-search-gateway-1  Starting
+ Container proximity-search-gateway-1  Started
+
+real	0m7.375s
+user	0m0.075s
+sys	0m0.106s
+[exit 0]

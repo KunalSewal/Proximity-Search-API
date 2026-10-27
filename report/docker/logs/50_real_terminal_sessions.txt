@@ -1,0 +1,7 @@
+kunal@KS_Predator MSYS ~/OneDrive/Desktop/CSD/Proximity Search API (main)
+$ docker compose up -d --build
+$ docker compose ps --format 'table {{.Service}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+$ curl -s http://localhost:8080/health
+$ docker run --rm proximity-api:test
+$ python report/docker/parity.py
+$ docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}' $(docker compose ps -q)

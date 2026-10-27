@@ -1,0 +1,12 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker pull hello-world
+Using default tag: latest
+latest: Pulling from library/hello-world
+4f55086f7dd0: Pulling fs layer
+4f55086f7dd0: Download complete
+4f55086f7dd0: Pull complete
+d5e71e642bf5: Download complete
+Digest: sha256:11a3eb1597e864c51b3f56733cb2e8a90bf0c284bfc05f9444d81c558bc848aa
+Status: Downloaded newer image for hello-world:latest
+docker.io/library/hello-world:latest
+[exit 0]

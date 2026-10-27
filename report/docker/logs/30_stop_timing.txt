@@ -1,0 +1,9 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ time docker compose stop api
+ Container proximity-search-api-1  Stopping
+ Container proximity-search-api-1  Stopped
+
+real	0m0.918s
+user	0m0.015s
+sys	0m0.091s
+[exit 0]

@@ -1,0 +1,9 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker volume ls --filter name=proximity; docker compose exec gateway sh -c 'ls -l /var/log/nginx; tail -2 /var/log/nginx/access.log'
+DRIVER    VOLUME NAME
+local     proximity-search_gateway-logs
+total 0
+lrwxrwxrwx    1 root     root            11 Mar 24  2026 access.log -> /dev/stdout
+lrwxrwxrwx    1 root     root            11 Mar 24  2026 error.log -> /dev/stderr
+[exit 137]
+nd never returned: tail on /dev/stdout blocks)

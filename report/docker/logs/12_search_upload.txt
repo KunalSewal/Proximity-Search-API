@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ curl -s -X POST http://localhost:8080/search/ -F lat=0.5 -F long=0.5 -F cat=cafe -F rad=0.2 -F link=@links/link.txt | python -c "import json,sys; d=json.load(sys.stdin); print('ids  :', d['ids']); print('count:', d['count']); m=d['meta']; print('meta :', {k:m[k] for k in ('link_source','link_format','edges','candidates_in_radius','nodes_settled','time_ms')})"
+ids  : [4949, 5051, 5149, 4751, 4748, 5047, 5053, 5251, 4551, 4653]
+count: 10
+meta : {'link_source': 'upload:link.txt', 'link_format': 'coordinates', 'edges': 14800, 'candidates_in_radius': 149, 'nodes_settled': 65, 'time_ms': 62.26}
+[exit 0]

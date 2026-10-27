@@ -1,0 +1,5 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ python report/docker/parity.py
+queries: 200   identical top-10 lists (container vs native): 200/200
+round-trip via gateway: median 10.8 ms, p95 17.9 ms
+[exit 0]

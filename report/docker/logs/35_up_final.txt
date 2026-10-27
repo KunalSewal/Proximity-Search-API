@@ -1,0 +1,13 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose up -d 2>&1 && docker compose ps
+ Container proximity-search-api-1  Recreate
+ Container proximity-search-api-1  Recreated
+ Container proximity-search-gateway-1  Running
+ Container proximity-search-api-1  Starting
+ Container proximity-search-api-1  Started
+ Container proximity-search-api-1  Waiting
+ Container proximity-search-api-1  Healthy
+NAME                         IMAGE                   COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+proximity-search-api-1       proximity-api:1.0       "gunicorn app:app"       api       7 seconds ago        Up 5 seconds (healthy)        8000/tcp
+proximity-search-gateway-1   proximity-gateway:1.0   "/docker-entrypoint.…"   gateway   About a minute ago   Up About a minute (healthy)   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+[exit 0]

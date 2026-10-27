@@ -1,0 +1,15 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose up -d --build gateway 2>&1 | grep -vE '^#|^ *$'
+ proximity-api:1.0  Built
+ proximity-gateway:1.0  Built
+ Container proximity-search-api-1  Recreate
+ Container proximity-search-api-1  Recreated
+ Container proximity-search-gateway-1  Recreate
+ Container proximity-search-gateway-1  Recreated
+ Container proximity-search-api-1  Starting
+ Container proximity-search-api-1  Started
+ Container proximity-search-api-1  Waiting
+ Container proximity-search-api-1  Healthy
+ Container proximity-search-gateway-1  Starting
+ Container proximity-search-gateway-1  Started
+[exit 0]

@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker --version && docker compose version && docker info --format 'Server {{.ServerVersion}} | {{.OperatingSystem}} | {{.KernelVersion}} | {{.NCPU}} CPUs'
+Docker version 29.1.2, build 890dcca
+Docker Compose version v2.40.3-desktop.1
+Server 29.1.2 | Docker Desktop | 6.6.87.2-microsoft-standard-WSL2 | 20 CPUs
+[exit 0]

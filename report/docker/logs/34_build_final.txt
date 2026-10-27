@@ -1,0 +1,69 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose build --progress=plain api 2>&1
+--progress is a global compose flag, better use `docker compose --progress xx build ...
+#1 [internal] load local bake definitions
+#1 reading from stdin 608B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.16kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 1.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 300B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 334B done
+#5 DONE 0.0s
+
+#6 [builder 1/4] FROM docker.io/library/python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f
+#6 resolve docker.io/library/python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f 0.0s done
+#6 CACHED
+
+#7 [builder 2/4] RUN python -m venv /opt/venv
+#7 CACHED
+
+#8 [builder 3/4] COPY requirements.txt .
+#8 CACHED
+
+#9 [builder 4/4] RUN pip install -r requirements.txt
+#9 CACHED
+
+#10 [runtime 2/7] RUN useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin appuser
+#10 DONE 0.3s
+
+#11 [runtime 3/7] WORKDIR /app
+#11 DONE 0.1s
+
+#12 [runtime 4/7] COPY --from=builder /opt/venv /opt/venv
+#12 DONE 0.2s
+
+#13 [runtime 5/7] COPY app.py engine.py gunicorn.conf.py ./
+#13 DONE 0.1s
+
+#14 [runtime 6/7] COPY data/ data/
+#14 DONE 0.0s
+
+#15 [runtime 7/7] COPY links/ links/
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.7s done
+#16 exporting manifest sha256:9b71eaf108f3ba24aafba4d50db4e796191c8541c2140afdbc742e866d58572f 0.0s done
+#16 exporting config sha256:606d8107dc2e3e66e7618d81005e63285537bb91cdc6cb5dc63b755ce29fd433 0.0s done
+#16 exporting attestation manifest sha256:8902080a6e11e90bcde906e88b5af32ec4ce7c39d79bb51b1503c4a18b510cbe 0.0s done
+#16 exporting manifest list sha256:020d945d5d30e86ad6dca32ffed869414c35010d3c97f5a4e100e37f767f2a0d 0.0s done
+#16 naming to docker.io/library/proximity-api:1.0 done
+#16 unpacking to docker.io/library/proximity-api:1.0
+#16 unpacking to docker.io/library/proximity-api:1.0 0.3s done
+#16 DONE 1.1s
+
+#17 resolving provenance for metadata file
+#17 DONE 0.0s
+ proximity-api:1.0  Built
+[exit 0]

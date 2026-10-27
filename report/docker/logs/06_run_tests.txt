@@ -1,0 +1,11 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker run --rm proximity-api:test
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+../opt/venv/lib/python3.12/site-packages/_pytest/cacheprovider.py:469
+  /opt/venv/lib/python3.12/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/pytest-cache-files-swqw741t'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+23 passed, 1 warning in 3.74s
+[exit 0]

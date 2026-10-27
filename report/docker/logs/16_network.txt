@@ -1,0 +1,7 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker network inspect proximity-search_proxnet --format '{{.Name}} driver={{.Driver}} subnet={{(index .IPAM.Config 0).Subnet}}{{range .Containers}}
+  {{.Name}}  {{.IPv4Address}}{{end}}'
+proximity-search_proxnet driver=bridge subnet=172.21.0.0/16
+  proximity-search-gateway-1  172.21.0.3/16
+  proximity-search-api-1  172.21.0.2/16
+[exit 0]

@@ -1,0 +1,12 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ HOST_PORT=9090 docker compose up -d gateway 2>&1 | grep -v '^$'; docker compose port gateway 80; curl -s http://localhost:9090/gateway-health
+ Container proximity-search-api-1  Running
+ Container proximity-search-gateway-1  Recreate
+ Container proximity-search-gateway-1  Recreated
+ Container proximity-search-api-1  Waiting
+ Container proximity-search-api-1  Healthy
+ Container proximity-search-gateway-1  Starting
+ Container proximity-search-gateway-1  Started
+0.0.0.0:9090
+ok
+[exit 0]

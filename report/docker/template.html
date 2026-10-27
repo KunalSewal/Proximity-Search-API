@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Containerising the Proximity Search API</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16161a; --ink-2: #52514e; --muted: #8a8984; --rule: #e2e1dc; --wash: #f6f5f2;
+    --accent: #2a78d6; --accent-ink: #1c5cab; --accent-wash: #eef4fc; --orange: #eb6834;
+    --green: #1f8a4c; --red: #c23b30;
+    --serif: "Source Serif 4", Cambria, Georgia, serif;
+    --sans: Inter, "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  @page {
+    size: A4;
+    margin: 17mm 17mm 18mm 17mm;
+    @bottom-center { content: counter(page); font-family: Inter, "Segoe UI", sans-serif; font-size: 8pt; color: #8a8984; }
+    @bottom-left { content: "Containerising the Proximity Search API · CS559"; font-family: Inter, "Segoe UI", sans-serif; font-size: 7.5pt; color: #8a8984; }
+    @bottom-right { content: "Kunal Sewal · 12341270"; font-family: Inter, "Segoe UI", sans-serif; font-size: 7.5pt; color: #8a8984; }
+  }
+  @page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
+  * { box-sizing: border-box; }
+  html { background: #fff; }
+  body {
+    margin: 0 auto; max-width: 176mm; padding: 0;
+    font-family: var(--serif); font-size: 10.4pt; line-height: 1.5; color: var(--ink); background: #fff;
+    font-variant-numeric: lining-nums; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  @media screen { body { padding: 24px 16px 64px; } }
+
+  .masthead { border-bottom: 1.5px solid var(--ink); padding-bottom: 14px; margin-bottom: 16px; }
+  .kicker { font-family: var(--sans); font-size: 8pt; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: 25pt; line-height: 1.1; margin: 6px 0 4px; letter-spacing: -.01em; }
+  .subtitle { font-size: 13pt; color: var(--ink-2); font-style: italic; margin: 0 0 14px; }
+  .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 18px; font-family: var(--sans); font-size: 8.4pt; }
+  .meta div span { display: block; color: var(--muted); font-size: 7.2pt; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .meta a { color: var(--ink); text-decoration: none; }
+  .meta b { font-weight: 600; }
+
+  .abstract { background: var(--wash); border-left: 3px solid var(--accent); padding: 10px 14px; margin: 0 0 14px; font-size: 9.9pt; }
+  .abstract h2 { font-family: var(--sans); font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 4px; color: var(--ink-2); }
+  .abstract p { margin: 0; }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 16px; }
+  .tile { border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px 7px; }
+  .tile .v { font-family: var(--sans); font-weight: 600; font-size: 17pt; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .tile .v small { font-size: 9pt; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
+  .tile .l { font-family: var(--sans); font-size: 7.6pt; color: var(--ink-2); margin-top: 3px; line-height: 1.3; }
+
+  .toc { font-family: var(--sans); font-size: 8.4pt; columns: 2; column-gap: 22px; margin: 0 0 6px; padding: 0; list-style: none; color: var(--ink-2); }
+  .toc li { break-inside: avoid; padding: 1px 0; }
+  .toc li b { color: var(--ink); font-weight: 600; display: inline-block; width: 18px; }
+
+  h2 { font-family: var(--sans); font-size: 13pt; font-weight: 700; margin: 22px 0 6px; letter-spacing: -.005em; break-after: avoid; }
+  h2 .n { color: var(--accent); margin-right: 8px; }
+  h3 { font-family: var(--sans); font-size: 10.2pt; font-weight: 600; margin: 14px 0 4px; break-after: avoid; }
+  h3 .n { color: var(--muted); margin-right: 6px; font-weight: 500; }
+  p { margin: 0 0 8px; text-align: justify; hyphens: auto; orphans: 3; widows: 3; }
+  ul, ol { margin: 0 0 8px; padding-left: 20px; }
+  li { margin: 2px 0; }
+  code, .mono { font-family: var(--mono); font-size: 8.6pt; background: var(--wash); padding: 0 3px; border-radius: 3px; }
+  a { color: var(--accent-ink); }
+  .pb { break-before: page; }
+  .keep { break-inside: avoid; }
+
+  table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 8.3pt; line-height: 1.35; margin: 4px 0 10px; }
+  tr { break-inside: avoid; }
+  th { text-align: left; font-weight: 600; color: var(--ink-2); border-bottom: 1.2px solid var(--ink); padding: 4px 6px; font-size: 7.8pt; text-transform: uppercase; letter-spacing: .04em; }
+  td { border-bottom: 1px solid var(--rule); padding: 4px 6px; vertical-align: top; }
+  td code { font-size: 7.8pt; }
+  td.nw { white-space: nowrap; }
+  .tcap { font-family: var(--sans); font-size: 8pt; color: var(--ink-2); margin: 10px 0 2px; break-after: avoid; }
+  .tcap b { color: var(--ink); }
+
+  figure { margin: 8px 0 12px; break-inside: avoid; }
+  figure img { display: block; margin: 0 auto; max-width: 100%; }
+  figure img.shot { border-radius: 4px; }
+  figure img.browser { border: 1px solid var(--rule); border-radius: 4px; }
+  figcaption { font-family: var(--sans); font-size: 8pt; color: var(--ink-2); margin-top: 5px; line-height: 1.4; }
+  figcaption b { color: var(--ink); }
+  .url { font-family: var(--mono); font-size: 7.4pt; color: var(--ink-2); background: var(--wash); border: 1px solid var(--rule); border-bottom: 0; border-radius: 4px 4px 0 0; padding: 3px 8px; }
+
+  pre { font-family: var(--mono); font-size: 7.6pt; line-height: 1.42; background: var(--wash); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; margin: 4px 0 10px; white-space: pre-wrap; }
+  pre.listing { break-inside: auto; }
+  pre .c { color: var(--muted); }
+  .fname { font-family: var(--mono); font-size: 8pt; font-weight: 500; color: var(--accent-ink); margin: 10px 0 0; break-after: avoid; }
+
+  .callout { border: 1px solid var(--rule); border-left: 3px solid var(--orange); border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0 12px; font-size: 9.6pt; break-inside: avoid; }
+  .callout b:first-child { font-family: var(--sans); font-size: 8.4pt; text-transform: uppercase; letter-spacing: .06em; color: #b84a1d; display: block; margin-bottom: 2px; }
+
+  .err { border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px 4px; margin: 0 0 10px; break-inside: avoid; }
+  .err h3 { margin: 0 0 4px; display: flex; gap: 8px; align-items: baseline; }
+  .err h3 .n { color: var(--red); font-weight: 700; }
+  .err .row { display: grid; grid-template-columns: 76px 1fr; gap: 2px 10px; font-size: 9.6pt; margin-bottom: 4px; }
+  .err .row > span { font-family: var(--sans); font-size: 7.4pt; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+  .err .row p { margin: 0; text-align: left; hyphens: manual; }
+  .tile code { font-size: 7pt; white-space: nowrap; }
+  figure .url { margin: 0 auto; box-sizing: border-box; }
+  .err figure { margin: 4px 0 6px; }
+
+  svg text { font-family: var(--sans); }
+
+  @media (max-width: 640px) {
+    .meta, .tiles { grid-template-columns: 1fr 1fr; }
+    .toc { columns: 1; }
+    h1 { font-size: 20pt; }
+    table { display: block; overflow-x: auto; }
+    .err .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="kicker">CS559 · Computer Systems Design · Lab Report</div>
+  <h1>Containerising the Proximity Search API</h1>
+  <p class="subtitle">The Lab 7 service as a two-container Docker Compose stack, started with one command</p>
+  <div class="meta">
+    <div><span>Author</span><b>Kunal Sewal</b></div>
+    <div><span>Student ID</span><b>12341270</b></div>
+    <div><span>Date</span>27 October 2026</div>
+    <div><span>Machine (personal)</span>KS_Predator · Windows 11 Home</div>
+    <div><span>Docker</span>Desktop 4.54.0 · Engine 29.1.2 · Compose v2.40.3</div>
+    <div><span>Source code</span><a href="https://github.com/KunalSewal/Proximity-Search-API">github.com/KunalSewal/Proximity-Search-API</a></div>
+  </div>
+</header>
+
+<section class="abstract">
+  <h2>Abstract</h2>
+  <p>The Proximity Search API from Lab 7 (Flask + gunicorn, Dijkstra over a road-linkage file) was
+  packaged as two containers: an <b>api</b> service built from a multi-stage <code>python:3.12-slim</code>
+  Dockerfile, and a <b>gateway</b> service built from <code>nginx:1.28-alpine</code> that acts as the reverse
+  proxy and serves the link files over HTTP. A single <code>docker-compose.yml</code> builds both images, creates a
+  private bridge network and a named log volume, and starts the API first and the gateway only once the
+  API passes its health check. <code>docker compose up -d --build</code> is the only command
+  needed. All work was done on my personal laptop (Docker Desktop on WSL&nbsp;2). The test suite passes inside
+  a container (23/23), and 200 random queries sent through the stack returned exactly the same top-10 lists
+  as the engine run natively. Twelve problems came up along the way; each one, with its cause and
+  fix, is recorded in Section&nbsp;4.</p>
+</section>
+
+<div class="tiles">
+  <div class="tile"><div class="v">1<small>command</small></div><div class="l"><code>docker compose up -d --build</code> builds and starts the whole stack</div></div>
+  <div class="tile"><div class="v">2<small>services</small></div><div class="l">api (gunicorn) behind gateway (nginx); only port 8080 is published</div></div>
+  <div class="tile"><div class="v">200/200</div><div class="l">identical top-10 results, container vs. native engine (median 10.8&nbsp;ms round trip)</div></div>
+  <div class="tile"><div class="v">7.4<small>s</small></div><div class="l">cold start of the full stack from built images, including health checks</div></div>
+</div>
+
+<ol class="toc">
+  <li><b>1</b>Architecture of the stack</li>
+  <li><b>2</b>Docker design choices</li>
+  <li><b>3</b>Steps followed, with screenshots</li>
+  <li><b>4</b>Errors faced and how they were resolved</li>
+  <li><b>5</b>Docker commands used</li>
+  <li><b>6</b>What I learnt</li>
+  <li><b>A</b>Appendix: complete Docker files</li>
+</ol>
+
+<h2><span class="n">1</span>Architecture of the stack</h2>
+<p>The Lab 7 application is one Python process. It loads the 10,000-location CSV at start-up, and for each
+<code>/search/</code> request it parses the link file (or reuses a cached graph) and runs Dijkstra. I split
+the stack into two services: the application itself, and an nginx gateway in front of it. The gateway is the
+only container that can be reached from the host. It enforces the upload limit, forwards requests to
+gunicorn, and serves the <code>links/</code> folder at <code>/files/</code>. That last job lets the API's
+"link as a URL" input work entirely inside the Docker network:
+<code>link=http://gateway/files/link.txt</code> is resolved by Docker's DNS to the gateway container.</p>
+
+<figure>
+<svg viewBox="0 0 680 300" width="100%" role="img" aria-label="Architecture: host port 8080 to nginx gateway to gunicorn api over the proxnet bridge network">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52514e"/></marker>
+  </defs>
+  <!-- host -->
+  <rect x="4" y="4" width="672" height="292" rx="10" fill="#fff" stroke="#c9c8c2" stroke-dasharray="5 4"/>
+  <text x="18" y="24" font-size="11" font-weight="600" fill="#52514e">Personal laptop · Windows 11 · Docker Desktop (WSL 2 VM)</text>
+  <!-- client -->
+  <rect x="20" y="104" width="110" height="64" rx="7" fill="#f6f5f2" stroke="#c9c8c2"/>
+  <text x="75" y="130" font-size="11" font-weight="600" text-anchor="middle" fill="#16161a">Client</text>
+  <text x="75" y="147" font-size="9" text-anchor="middle" fill="#52514e">curl / browser /</text>
+  <text x="75" y="159" font-size="9" text-anchor="middle" fill="#52514e">Python requests</text>
+  <!-- network -->
+  <rect x="168" y="40" width="490" height="196" rx="9" fill="#eef4fc" stroke="#2a78d6"/>
+  <text x="182" y="58" font-size="10" font-weight="600" fill="#1c5cab">network: proxnet (user-defined bridge, 172.21.0.0/16, built-in DNS)</text>
+  <!-- port -->
+  <line x1="130" y1="136" x2="200" y2="136" stroke="#52514e" stroke-width="1.4" marker-end="url(#ar)"/>
+  <text x="165" y="128" font-size="9" font-weight="600" text-anchor="middle" fill="#16161a">:8080</text>
+  <text x="165" y="152" font-size="8" text-anchor="middle" fill="#52514e">→ 80</text>
+  <!-- gateway -->
+  <rect x="202" y="76" width="190" height="120" rx="7" fill="#fff" stroke="#16161a"/>
+  <text x="214" y="96" font-size="11.5" font-weight="700" fill="#16161a">gateway</text>
+  <text x="214" y="111" font-size="9" fill="#52514e">nginx:1.28-alpine · 172.21.0.3</text>
+  <text x="214" y="130" font-size="9" fill="#16161a">/            → proxy to api:8000</text>
+  <text x="214" y="144" font-size="9" fill="#16161a">/files/      → static link files</text>
+  <text x="214" y="158" font-size="9" fill="#16161a">/gateway-health</text>
+  <text x="214" y="176" font-size="8.5" fill="#52514e">client_max_body_size 64m</text>
+  <text x="214" y="188" font-size="8.5" fill="#52514e">healthcheck: wget</text>
+  <!-- api -->
+  <rect x="452" y="76" width="190" height="120" rx="7" fill="#fff" stroke="#16161a"/>
+  <text x="464" y="96" font-size="11.5" font-weight="700" fill="#16161a">api</text>
+  <text x="464" y="111" font-size="9" fill="#52514e">python:3.12-slim · 172.21.0.2</text>
+  <text x="464" y="130" font-size="9" fill="#16161a">gunicorn app:app</text>
+  <text x="464" y="144" font-size="9" fill="#16161a">4 workers × 2 threads, :8000</text>
+  <text x="464" y="158" font-size="9" fill="#16161a">user appuser (uid 10001)</text>
+  <text x="464" y="176" font-size="8.5" fill="#52514e">dataset baked into image</text>
+  <text x="464" y="188" font-size="8.5" fill="#52514e">healthcheck: GET /health</text>
+  <!-- arrows between -->
+  <line x1="392" y1="122" x2="450" y2="122" stroke="#52514e" stroke-width="1.4" marker-end="url(#ar)"/>
+  <text x="421" y="116" font-size="8" text-anchor="middle" fill="#52514e">HTTP</text>
+  <path d="M452,160 C425,160 420,160 394,160" fill="none" stroke="#eb6834" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+  <text x="421" y="174" font-size="7.5" text-anchor="middle" fill="#b84a1d">link=URL</text>
+  <!-- depends -->
+  <text x="421" y="222" font-size="8.5" text-anchor="middle" fill="#52514e">gateway starts only after api reports healthy (depends_on: service_healthy)</text>
+  <!-- volumes -->
+  <rect x="202" y="250" width="190" height="36" rx="6" fill="#f6f5f2" stroke="#c9c8c2"/>
+  <text x="297" y="266" font-size="9" font-weight="600" text-anchor="middle" fill="#16161a">named volume: gateway-logs</text>
+  <text x="297" y="279" font-size="8" text-anchor="middle" fill="#52514e">→ /var/log/nginx</text>
+  <rect x="452" y="250" width="190" height="36" rx="6" fill="#f6f5f2" stroke="#c9c8c2"/>
+  <text x="547" y="266" font-size="9" font-weight="600" text-anchor="middle" fill="#16161a">bind mount: ./links (read-only)</text>
+  <text x="547" y="279" font-size="8" text-anchor="middle" fill="#52514e">→ api:/app/links, gateway:/srv/links</text>
+  <line x1="297" y1="250" x2="297" y2="198" stroke="#8a8984" stroke-width="1"/>
+  <line x1="547" y1="250" x2="547" y2="198" stroke="#8a8984" stroke-width="1"/>
+  <line x1="452" y1="268" x2="392" y2="200" stroke="#8a8984" stroke-width="1" stroke-dasharray="3 3"/>
+</svg>
+<figcaption><b>Figure 1.</b> The stack. Only the gateway publishes a port, so the API can be reached only through
+nginx. The orange dashed arrow is the API fetching a link file from the gateway by URL. Both containers mount the
+same host <code>links/</code> folder read-only.</figcaption>
+</figure>
+
+<h3>Files added to the repository</h3>
+<table>
+  <thead><tr><th style="width:31%">File</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>Dockerfile</code></td><td>API image. Stages: <code>builder</code> (venv + dependencies) → <code>runtime</code>; <code>testdeps</code> (+ pytest) → <code>test</code></td></tr>
+    <tr><td><code>gateway/Dockerfile</code></td><td>Gateway image: nginx with a config template and a health check</td></tr>
+    <tr><td><code>gateway/default.conf.template</code></td><td>nginx server block; <code>${API_HOST}</code>, <code>${API_PORT}</code>, <code>${MAX_UPLOAD}</code> are filled in at start-up</td></tr>
+    <tr><td><code>docker-compose.yml</code></td><td>Both services, the <code>proxnet</code> network, the <code>gateway-logs</code> volume, ports and environment</td></tr>
+    <tr><td><code>gunicorn.conf.py</code></td><td>gunicorn settings read from <code>PORT</code>, <code>WORKERS</code>, <code>THREADS</code>, so <code>CMD</code> can be exec form</td></tr>
+    <tr><td><code>.dockerignore</code></td><td>Keeps <code>.git</code>, the report, tools and stray copies of the dataset out of the build context</td></tr>
+    <tr><td><code>.env.example</code></td><td>Host-side settings (<code>HOST_PORT</code>, <code>API_WORKERS</code>, …); copied to <code>.env</code>, which is git-ignored</td></tr>
+  </tbody>
+</table>
+
+<h2 class="pb"><span class="n">2</span>Docker design choices</h2>
+
+<h3><span class="n">2.1</span>Base images</h3>
+<table>
+  <thead><tr><th style="width:18%">Service</th><th style="width:24%">Base image</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>api</td><td><code>python:3.12-slim</code><br>(Debian, both stages)</td><td>Matches the Python 3.12 used in development. <i>slim</i> leaves out compilers and docs but keeps glibc, so
+      wheels from PyPI install as-is (Alpine's musl would force source builds for some packages). Final image:
+      50&nbsp;MB compressed content, 210&nbsp;MB on disk.</td></tr>
+    <tr><td>gateway</td><td><code>nginx:1.28-alpine</code></td><td>The current stable nginx line, on Alpine because nothing here is compiled. The official image already
+      runs <code>envsubst</code> over <code>/etc/nginx/templates/*.template</code>, so the upstream host and upload limit can
+      come from environment variables without a custom entrypoint. Image: 26&nbsp;MB compressed, 92.5&nbsp;MB on disk.</td></tr>
+  </tbody>
+</table>
+<p><b>Multi-stage build.</b> The <code>builder</code> stage creates <code>/opt/venv</code> and installs Flask and
+gunicorn. The <code>runtime</code> stage starts again from a clean <code>python:3.12-slim</code> and copies in only
+the venv and the app (<code>app.py</code>, <code>engine.py</code>, <code>gunicorn.conf.py</code>, <code>data/</code>,
+<code>links/</code>), so pip's caches and build leftovers never reach the final image. <code>requirements.txt</code>
+is copied and installed before any source code, so editing <code>engine.py</code> reuses the cached dependency
+layer instead of reinstalling. A separate <code>testdeps</code> stage adds pytest to the same venv; the
+<code>test</code> target is <code>runtime</code> plus that venv plus <code>tests/</code>, so the shipped image never
+contains pytest.</p>
+<p><b>Security.</b> The API runs as <code>appuser</code> (uid 10001, no home directory, <code>nologin</code> shell). The
+application files are owned by root and read-only for that user, and both health checks use tools
+already in the base images (Python's <code>urllib</code>, BusyBox <code>wget</code>), so no curl package is added.</p>
+
+<h3><span class="n">2.2</span>Ports</h3>
+<table>
+  <thead><tr><th style="width:18%">Container</th><th style="width:22%">Port</th><th>Exposure</th></tr></thead>
+  <tbody>
+    <tr><td>gateway</td><td><code>80/tcp</code></td><td>Published as <code>${HOST_PORT:-8080}:80</code>, the only entry point from the host. 8080 avoids
+      needing admin rights for port 80 on Windows; it can be changed in <code>.env</code> without editing YAML.</td></tr>
+    <tr><td>api</td><td><code>8000/tcp</code></td><td><code>expose</code> only: reachable as <code>api:8000</code> on <code>proxnet</code>, not from the host
+      (verified in Figure 9: <code>curl localhost:8000</code> fails).</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">2.3</span>Networks</h3>
+<p>One user-defined bridge network, <code>proxnet</code>. Compose would create a default network anyway, but naming it
+makes the topology explicit in the YAML and in <code>docker network inspect</code>. On a user-defined bridge Docker
+runs an embedded DNS server (<code>127.0.0.11</code>), so containers find each other by service name. nginx's
+<code>upstream</code> points at <code>api:8000</code>, and the API can download <code>http://gateway/files/link.txt</code>.
+I considered marking the network <code>internal: true</code> to cut the API off from the internet entirely, but
+that would break the API's documented feature of fetching a link file from any <code>http(s)</code> URL, so the network
+stays a normal bridge and isolation comes from not publishing the API's port.</p>
+
+<h3><span class="n">2.4</span>Volumes</h3>
+<table>
+  <thead><tr><th style="width:30%">Mount</th><th style="width:16%">Type</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td><code>./links → /app/links:ro</code> (api)<br><code>./links → /srv/links:ro</code> (gateway)</td><td>bind mount, read-only</td>
+      <td>New link files dropped into <code>links/</code> on the host are immediately usable by name (<code>link=my.txt</code>) and by URL,
+      without rebuilding. Read-only because neither container should change them.</td></tr>
+    <tr><td><code>gateway-logs → /var/log/nginx</code></td><td>named volume</td><td>Keeps the gateway's access log across
+      <code>docker compose down</code>/<code>up</code> (verified: Figure 13). The API's own log goes to stdout and is read with
+      <code>docker compose logs</code>.</td></tr>
+    <tr><td><code>data/locations.csv</code></td><td>copied into the image</td><td>The dataset is fixed and is what the API is evaluated on,
+      so it belongs to the image version. It can still be replaced at run time by mounting a file and setting <code>LOCATIONS_CSV</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">2.5</span>Environment variables</h3>
+<table>
+  <thead><tr><th style="width:21%">Variable</th><th style="width:13%">Where</th><th style="width:20%">Default</th><th>Effect</th></tr></thead>
+  <tbody>
+    <tr><td><code>PORT</code></td><td>api</td><td class="nw"><code>8000</code></td><td>gunicorn bind port (read by <code>gunicorn.conf.py</code> and the health check)</td></tr>
+    <tr><td><code>WORKERS</code>, <code>THREADS</code></td><td>api</td><td class="nw"><code>4</code>, <code>2</code></td><td>gunicorn processes and threads per process; set from <code>API_WORKERS</code>/<code>API_THREADS</code> in <code>.env</code></td></tr>
+    <tr><td><code>LOCATIONS_CSV</code></td><td>api</td><td class="nw"><code>/app/data/locations.csv</code></td><td>Dataset path (already supported by <code>app.py</code>)</td></tr>
+    <tr><td><code>LINKS_DIR</code></td><td>api</td><td class="nw"><code>/app/links</code></td><td>Folder searched when <code>link</code> is a bare filename</td></tr>
+    <tr><td><code>PYTHONUNBUFFERED</code>, <code>PYTHONDONTWRITEBYTECODE</code></td><td>api</td><td class="nw"><code>1</code></td><td>Logs appear in <code>docker logs</code> immediately; no <code>.pyc</code> writes into the read-only app folder</td></tr>
+    <tr><td><code>PIP_DEFAULT_TIMEOUT</code>, <code>PIP_RETRIES</code></td><td>builder</td><td class="nw"><code>120</code>, <code>10</code></td><td>Build-time only: survive the slow connection to PyPI (Error 2)</td></tr>
+    <tr><td><code>API_HOST</code>, <code>API_PORT</code></td><td>gateway</td><td class="nw"><code>api</code>, <code>8000</code></td><td>Substituted into the nginx <code>upstream</code> block at start-up</td></tr>
+    <tr><td><code>MAX_UPLOAD</code></td><td>gateway</td><td class="nw"><code>64m</code></td><td><code>client_max_body_size</code>; nginx's default of 1&nbsp;MB would reject large link uploads</td></tr>
+    <tr><td><code>HOST_PORT</code></td><td>compose (.env)</td><td class="nw"><code>8080</code></td><td>Host side of the gateway's port mapping</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">2.6</span>Start-up order, health and restarts</h3>
+<p>Each image defines a <code>HEALTHCHECK</code>: the API runs <code>GET /health</code> every 15&nbsp;s and the gateway fetches
+<code>/gateway-health</code>. The gateway's <code>depends_on</code> uses <code>condition: service_healthy</code>, so nginx
+starts only after the API has loaded the dataset and is answering. The output of <code>docker compose up</code> shows
+<i>api Waiting → Healthy</i> and only then <i>gateway Starting</i> (Figure 4). Both services use
+<code>restart: unless-stopped</code>. <code>CMD</code> is in exec (JSON) form so that gunicorn is PID&nbsp;1 and receives
+<code>SIGTERM</code> directly: <code>docker compose stop api</code> finishes in 0.9&nbsp;s instead of waiting for the 10&nbsp;s kill
+timeout (Error 3).</p>
+
+<h2 class="pb"><span class="n">3</span>Steps followed, with screenshots</h2>
+<p>All steps were run on my own laptop (Windows 11 Home, 20 logical CPUs, 8&nbsp;GB given to Docker's WSL&nbsp;2 VM) from
+Git Bash in the project folder; the same commands work unchanged in PowerShell. Every command's output was
+captured to a log file as it ran (all logs are in <code>report/docker/logs/</code>), and Figures 2–13 show that output,
+unedited, in a terminal frame; <span class="mono">⋮</span> marks where lines of a long build log were cut for space.
+Section&nbsp;3.10 has direct captures of real Git Bash windows running the main steps.</p>
+
+<h3><span class="n">3.1</span>Install Docker and check the installation</h3>
+<p>Docker on Windows runs Linux containers inside a lightweight VM managed by WSL&nbsp;2, so the installation has two
+parts. These are the steps followed on this laptop:</p>
+<ol>
+  <li><b>Check virtualisation.</b> Hardware virtualisation (Intel VT-x on this laptop's Core i5-13500HX) must be enabled
+    in the BIOS. Task Manager → Performance → CPU shows <i>Virtualization: Enabled</i>.</li>
+  <li><b>Install WSL&nbsp;2.</b> In an administrator PowerShell: <code>wsl --install</code>. This enables the
+    <i>Virtual Machine Platform</i> and <i>Windows Subsystem for Linux</i> features, installs the WSL kernel and an
+    Ubuntu distribution, and needs one reboot. <code>wsl --version</code> then confirms WSL&nbsp;2.6 with Linux kernel 6.6.</li>
+  <li><b>Install Docker Desktop.</b> Download <i>Docker Desktop Installer.exe</i> from
+    <code>docs.docker.com/desktop/setup/install/windows-install/</code>, run it, and keep
+    <i>Use WSL&nbsp;2 instead of Hyper-V</i> ticked. It installs to <code>C:\Program Files\Docker\Docker</code> and adds
+    the <code>docker</code> CLI, BuildKit (<code>buildx</code>) and the Compose v2 plugin to the PATH.</li>
+  <li><b>First start.</b> Launch Docker Desktop and accept the subscription agreement (free for personal and education
+    use). On first start it creates its own WSL distribution, <code>docker-desktop</code>, which runs the Docker
+    Engine, and a CLI context <code>desktop-linux</code> that connects to it through a named pipe. If the CLI is used
+    before the engine is running, it fails with the named-pipe error in Error 1.</li>
+  <li><b>Verify.</b> <code>docker version</code> must show both a client and a server, and
+    <code>docker run hello-world</code> must print its greeting.</li>
+</ol>
+{{SHOT:44_install_desktop|Figure 2a. Docker Desktop 4.54.0 is registered as an installed program, in C:\Program Files\Docker\Docker.}}
+{{SHOT:45_install_wsl|Figure 2b. WSL 2 is installed, and the docker-desktop distribution (the VM that runs the engine) is running next to Ubuntu.}}
+{{SHOT:46_docker_version|Figure 2c. <code>docker version</code>: a Windows client talking to a Linux server (Docker Desktop 4.54.0, Engine 29.1.2, containerd 2.2, runc 1.3).}}
+{{SHOT:49_hello_world|Figure 2d. The official installation test. The first attempt failed while downloading the image (see Error 6); after <code>docker pull hello-world</code> it ran correctly.}}
+{{SHOT:02_versions|Figure 2e. Client, Compose and engine versions in one line; the engine runs on the WSL 2 kernel.}}
+
+<h3><span class="n">3.2</span>Write the Dockerfiles and the compose file, then validate</h3>
+<p>The files listed in Section&nbsp;1 were written (full text in the Appendix). <code>docker compose config</code> parses
+the YAML, fills in the <code>.env</code> values and reports errors without building anything:</p>
+{{SHOT:03_compose_config|Figure 3. The compose file is valid and defines two services.}}
+
+<h3><span class="n">3.3</span>Build the test image and run the tests in a container</h3>
+<p>Before starting the stack, the <code>test</code> stage was built and the existing 23 pytest tests (which compare the
+engine against Floyd–Warshall and exhaustive-search references) were run inside it. This checks that the
+code behaves the same in the Linux container as it did on Windows. The first attempts hit Errors 2, 4, 5,
+10, 11 and 12; the final run:</p>
+{{SHOT:38_build_test_excerpt|Figure 4a. Building the test target with the final Dockerfile. pytest's metadata comes from the BuildKit cache mount filled by the failed attempt ("Using cached"), and the remaining downloads finish at about 17 kB/s (Error 12).}}
+{{SHOT:36_tests_final|Figure 4b. All 23 tests pass inside the container, with no warnings.}}
+
+<h3><span class="n">3.4</span>Build and start the whole stack with one command</h3>
+{{SHOT:08_compose_up_excerpt|Figure 5. <code>docker compose up -d --build</code> builds both images, creates the network and the volume, waits for the API to become healthy, then starts the gateway. The red lines are a CDN download error that BuildKit retried on its own (Error 6).}}
+{{SHOT:09_compose_ps|Figure 6. Both containers are up and healthy. Only the gateway has a host port (8080 → 80); the API shows only 8000/tcp.}}
+{{SHOT:10_images|Figure 7. The two images built by Compose, plus the test image.}}
+
+<h3><span class="n">3.5</span>Use the API through the gateway</h3>
+{{SHOT:11_health|Figure 8a. Health endpoints: the API's /health (proxied by nginx) and nginx's own /gateway-health.}}
+{{SHOT:12_search_upload|Figure 8b. The README's example query, uploading link.txt as a file. The IDs match the Lab 7 deployment exactly.}}
+{{BROWSER:b_search|http://localhost:8080/search/?lat=0.5&amp;long=0.5&amp;cat=cafe&amp;rad=0.2&amp;link=http://gateway/files/link.txt|Figure 8c. The same query in Chrome, this time with <code>link</code> given as a URL that points at the gateway. The API container fetched the link file from the gateway container by its service name (<code>"link_source":"url"</code>).}}
+
+<h3><span class="n">3.6</span>Verify the network, isolation and configuration</h3>
+{{SHOT:15_api_not_published|Figure 9. The API's port is not reachable from the host; all traffic has to go through nginx.}}
+{{SHOT:16_network|Figure 10a. The proxnet bridge network and the address of each container.}}
+{{SHOT:17_dns|Figure 10b. Docker's embedded DNS resolves service names in both directions.}}
+{{SHOT:18_exec_env|Figure 10c. Inside the API container: the process runs as the non-root appuser, the environment variables are set, and the app files belong to root.}}
+{{BROWSER:b_files|http://localhost:8080/files/|Figure 10d. The read-only links/ bind mount, served by nginx at /files/.}}
+
+<h3><span class="n">3.7</span>Check that the container gives the same answers as the native code</h3>
+<p>A short script sent 200 random queries (random position, category and radius, seed 42) through the gateway and
+compared each top-10 list with the one from <code>engine.py</code> run directly on Windows:</p>
+{{SHOT:19_parity|Figure 11. 200 of 200 identical results; median round trip 10.8 ms through nginx and gunicorn.}}
+
+<h3><span class="n">3.8</span>Logs, resource usage and the log volume</h3>
+{{SHOT:20_logs|Figure 12a. <code>docker compose logs</code>: requests reach gunicorn from the gateway's address (172.21.0.3) and nginx from the host side of the bridge (172.21.0.1).}}
+{{SHOT:28_stats_scoped|Figure 12b. Live resource use of the two containers: the API takes about 165 MiB (four workers, each holding the dataset), nginx about 15 MiB.}}
+{{SHOT:29_volume_fixed|Figure 13a. After the fix for Error 7, the gateway writes a real log file into the named volume.}}
+
+<h3><span class="n">3.9</span>Stop, tear down and start again</h3>
+{{SHOT:30_stop_timing|Figure 13b. A graceful stop takes under a second, because gunicorn is PID 1 and handles SIGTERM.}}
+{{SHOT:31_down|Figure 13c. <code>docker compose down</code> removes the containers and the network but keeps the named volume.}}
+{{SHOT:32_up_again|Figure 13d. Starting again from the built images takes 7.4 s, including the API's health check.}}
+{{SHOT:33_volume_persisted|Figure 13e. The access log survived <code>down</code>/<code>up</code>: the volume persists.}}
+{{SHOT:39_env_override|Figure 13f. Overriding an environment variable from the shell: HOST_PORT=9090 republishes the gateway on port 9090 without editing any file.}}
+
+<h3 class="pb"><span class="n">3.10</span>Real terminal windows</h3>
+<p>To show the steps as they look on screen, the main build, run and verify commands were run once more in Git Bash
+windows, and each window was captured directly. The <code>$ </code> lines come from bash's own command trace
+(<code>set -x</code>).</p>
+{{SHOT:real/term_compose_up|Figure 14a. Git Bash window: <code>docker compose up -d --build</code> finishing (images built, api Healthy, then gateway Started), the status table, and the health endpoint through the gateway.}}
+{{SHOT:real/term_verify|Figure 14b. Git Bash window: the test suite inside the test image (23 passed), the 200-query check against the native engine (200/200), and the containers' live resource use.}}
+
+<h2 class="pb"><span class="n">4</span>Errors faced and how they were resolved</h2>
+<p>These are the problems that actually came up, in the order they appeared, each with the evidence captured at
+the time.</p>
+
+<div class="err">
+  <h3><span class="n">1</span>Docker engine not running</h3>
+  <div class="row"><span>Symptom</span><p><code>docker ps</code> → <code>failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine … The system cannot find the file specified.</code></p></div>
+  <div class="row"><span>Cause</span><p>On Windows the <code>docker</code> CLI is only a client. It talks to the engine inside Docker Desktop's WSL&nbsp;2 VM through a named pipe, and that pipe exists only while Docker Desktop is running.</p></div>
+  <div class="row"><span>Fix</span><p>Started Docker Desktop and polled <code>docker info</code> until the engine answered (Figures 2c and 2e).</p></div>
+  {{SHOT:01_daemon_down|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">2</span><code>pip install</code> timed out during the build (ReadTimeoutError)</h3>
+  <div class="row"><span>Symptom</span><p>The build failed after 93&nbsp;s: <code>ReadTimeoutError: HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Read timed out.</code> Even the successful step that installed Flask took 110&nbsp;s.</p></div>
+  <div class="row"><span>Cause</span><p>The internet connection to PyPI's file CDN was very slow, and pip's default read timeout of 15&nbsp;s was shorter than some of its stalls.</p></div>
+  <div class="row"><span>Fix</span><p>Set <code>PIP_DEFAULT_TIMEOUT=120</code> and <code>PIP_RETRIES=10</code> in the builder stage. Later builds log <code>WARNING: Retrying …</code> and then succeed instead of failing (Figure 4a).</p></div>
+  {{SHOT:04_pip_timeout_excerpt|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">3</span>Build-check warning: <code>JSONArgsRecommended</code></h3>
+  <div class="row"><span>Symptom</span><p>BuildKit warned: <code>JSON arguments recommended for CMD to prevent unintended behavior related to OS signals</code> (visible at the bottom of the previous screenshot).</p></div>
+  <div class="row"><span>Cause</span><p>The first Dockerfile used a shell-form <code>CMD exec gunicorn --bind "0.0.0.0:${PORT}" …</code> so that environment variables would be expanded. Shell form runs under <code>/bin/sh -c</code>, which may not pass <code>SIGTERM</code> on to gunicorn, so <code>docker stop</code> would wait 10&nbsp;s and then kill it.</p></div>
+  <div class="row"><span>Fix</span><p>Moved the settings into <code>gunicorn.conf.py</code>, which reads <code>PORT</code>/<code>WORKERS</code>/<code>THREADS</code> from the environment (gunicorn loads it automatically from the working directory), and changed to <code>CMD ["gunicorn", "app:app"]</code>. Stopping now takes 0.9&nbsp;s (Figure 13b).</p></div>
+</div>
+
+<div class="err">
+  <h3><span class="n">4</span><code>useradd</code> warning: uid above SYS_UID_MAX</h3>
+  <div class="row"><span>Symptom</span><p><code>useradd warning: appuser's uid 10001 is greater than SYS_UID_MAX 999</code> (top of the screenshot for Error 2).</p></div>
+  <div class="row"><span>Cause</span><p><code>--system</code> asks for an account in the system range (&lt;&nbsp;1000), but I had also given a fixed high uid. A high uid is deliberate, since it cannot collide with any account on the host.</p></div>
+  <div class="row"><span>Fix</span><p>Dropped <code>--system</code> and gave the account a <code>/usr/sbin/nologin</code> shell instead: <code>useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin appuser</code>.</p></div>
+</div>
+
+<div class="err">
+  <h3><span class="n">5</span>pytest could not write its cache inside the container</h3>
+  <div class="row"><span>Symptom</span><p>The tests passed, but with <code>PytestCacheWarning: could not create cache path /app/.pytest_cache … [Errno 13] Permission denied</code>.</p></div>
+  <div class="row"><span>Cause</span><p>The container runs as <code>appuser</code> and <code>/app</code> is owned by root. This is intended: the running app must not be able to modify its own code.</p></div>
+  <div class="row"><span>Fix</span><p>Kept the permissions and turned off pytest's cache plugin in the test image: <code>CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider"]</code>.</p></div>
+  {{SHOT:06_run_tests|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">6</span>Docker Hub layer download: <code>EOF</code></h3>
+  <div class="row"><span>Symptom</span><p>While pulling <code>nginx:1.28-alpine</code>: <code>error: failed to copy: httpReadSeeker: failed open … production.cloudfront.docker.com … EOF</code>.</p></div>
+  <div class="row"><span>Cause</span><p>The connection to Docker Hub's CDN dropped partway through a layer download, again caused by the unreliable network.</p></div>
+  <div class="row"><span>Fix</span><p>During the build none was needed: BuildKit logged <code>retrying in 1s</code>, and the pull and the build then succeeded (Figure 5). The same <code>EOF</code> later hit <code>docker run --rm hello-world</code> (below), and that command does <i>not</i> retry: it exited with code 125. I re-ran the download on its own with <code>docker pull hello-world</code>, which succeeded, and <code>docker run hello-world</code> then worked (Figure 2d). So BuildKit retries registry downloads, but plain <code>docker run</code> and <code>RUN pip install</code> inside a build do not (Error 2).</p></div>
+  {{SHOT:47_hello_world_eof|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">7</span>The log volume held nothing useful, and reading it hung the terminal</h3>
+  <div class="row"><span>Symptom</span><p><code>/var/log/nginx</code> in the named volume held only two symlinks, and <code>tail /var/log/nginx/access.log</code> never returned.</p></div>
+  <div class="row"><span>Cause</span><p>The official nginx image links <code>access.log → /dev/stdout</code> and <code>error.log → /dev/stderr</code> so that logs go to <code>docker logs</code>. When the empty named volume was first mounted, Docker copied those symlinks into it, so no log was ever written to disk, and <code>tail</code> on <code>/dev/stdout</code> blocks forever.</p></div>
+  <div class="row"><span>Fix</span><p>Added a second <code>access_log /var/log/nginx/gateway_access.log;</code> next to <code>access_log /dev/stdout;</code>. Logs now go to both <code>docker logs</code> and the volume (Figures 13a and 13e).</p></div>
+  {{SHOT:22_volume_hang|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">8</span>Git Bash rewrote container paths (MSYS path conversion)</h3>
+  <div class="row"><span>Symptom</span><p><code>docker compose exec gateway ls -l /var/log/nginx</code> → <code>ls: C:/Program Files/Git/var/log/nginx: No such file or directory</code>.</p></div>
+  <div class="row"><span>Cause</span><p>Git Bash (MSYS2) converts any argument that looks like a Unix path into a Windows path before running a Windows program such as <code>docker.exe</code>. It treated <code>/var/log/nginx</code> as relative to Git's install folder, even though the path was meant for inside the Linux container.</p></div>
+  <div class="row"><span>Fix</span><p>Set <code>export MSYS_NO_PATHCONV=1</code> for commands that pass container paths (Figure 13a). The same commands work unchanged in PowerShell, which does no such conversion.</p></div>
+  {{SHOT:27_msys_pathconv|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">9</span><code>docker stats</code> listed a container from another project</h3>
+  <div class="row"><span>Symptom</span><p>The stats table also showed <code>observability-lgtm-1</code>, a container from unrelated work on the same laptop.</p></div>
+  <div class="row"><span>Cause</span><p><code>docker stats</code> covers every running container on the engine, not just the current Compose project. This happens on a personal machine that is also used for other projects.</p></div>
+  <div class="row"><span>Fix</span><p>Limited it to this project with <code>docker stats --no-stream $(docker compose ps -q)</code> (Figure 12b).</p></div>
+  {{SHOT:21_stats|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">10</span>Every code change made the test build download pytest again (and time out)</h3>
+  <div class="row"><span>Symptom</span><p>After a one-line change to the runtime stage (the <code>useradd</code> fix), rebuilding the test image ran <code>pip install pytest</code> again and failed with the same <code>ReadTimeoutError</code> after 230&nbsp;s.</p></div>
+  <div class="row"><span>Cause</span><p>Layer-cache ordering. The <code>test</code> stage was <code>FROM runtime</code> followed by <code>RUN pip install pytest</code>, so any change in <code>runtime</code> (including any change to the source code) invalidated the pytest layer and forced a fresh download.</p></div>
+  <div class="row"><span>Fix</span><p>Added a <code>testdeps</code> stage (<code>FROM builder</code>) that installs pytest into the venv. That stage depends only on <code>requirements.txt</code>; <code>test</code> now copies the finished venv from it. Both pip steps also use a BuildKit cache mount, <code>RUN --mount=type=cache,target=/root/.cache/pip</code>, so downloaded wheels are kept between builds without ending up in an image. To check it, I appended a comment to <code>engine.py</code> and rebuilt: the source layer was rebuilt, the pip layers stayed <code>CACHED</code>, and the whole test image rebuilt in 2.3&nbsp;s (the edit was then reverted).</p></div>
+  {{SHOT:43_cache_after_code_change|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">11</span><code>No matching distribution found for flask&gt;=2.2</code></h3>
+  <div class="row"><span>Symptom</span><p>On the next build, pip could not even read the package index: <code>Could not find a version that satisfies the requirement flask&gt;=2.2 (from versions: none)</code>, after 137&nbsp;s.</p></div>
+  <div class="row"><span>Cause</span><p>"from versions: none" means pip got no index page at all. The message looks like a version problem, but the cause was the network. To confirm it, I fetched <code>https://pypi.org/simple/flask/</code> from the host (HTTP 200 in 0.4&nbsp;s) and from a throwaway <code>docker run --rm python:3.12-slim</code> container (39&nbsp;kB in 1.5&nbsp;s). Both worked, so DNS and the index were reachable from containers, and the failure was intermittent.</p></div>
+  <div class="row"><span>Fix</span><p>Re-ran the build unchanged. It got past the index this time (Flask installed after one retry), but the next download stalled again. That led to the real cause, Error 12.</p></div>
+  {{SHOT:37_no_match_excerpt|}}
+</div>
+
+<div class="err">
+  <h3><span class="n">12</span>Downloads inside Docker were about 100&times; slower than on the host</h3>
+  <div class="row"><span>Symptom</span><p>Even with retries, <code>pip install pytest</code> failed once more after 509&nbsp;s with <code>ReadTimeoutError</code>. Small requests (index pages) worked, but files of a few hundred kB stalled.</p></div>
+  <div class="row"><span>Diagnosis</span><p>I downloaded the same 386&nbsp;kB pytest wheel in different places. From the Windows host it took <b>0.5&nbsp;s</b>. From a container on the default bridge it either timed out or took <b>44&nbsp;s</b>. I suspected a path-MTU problem (common with WSL&nbsp;2 and VPNs), so I created a bridge network with MTU 1400: still 55–65&nbsp;s, so MTU was not the cause. With <code>--network host</code> (the VM's own network stack) it also failed. The bottleneck is therefore Docker Desktop's VM network path on this laptop, not the internet, the image or the Dockerfile. The successful build logged 16.9&nbsp;kB/s.</p></div>
+  <div class="row"><span>Fix</span><p>The build was made tolerant of the slow link instead of depending on it: the pip timeout and retries from Error 2, and the cache mount from Error 10. The mount meant that the failed attempt's downloads were reused (<code>Using cached pytest-9.1.1…</code>), and the next build succeeded (Figure 4a). After that, every rebuild hits the layer cache and needs no network at all. The proper fix would be in Docker Desktop's network settings (or a restart of its VM). I left that alone because other containers on this machine depend on the same engine.</p></div>
+  {{SHOT:42_vmnet_diag|}}
+</div>
+
+<h2 class="pb"><span class="n">5</span>Docker commands used</h2>
+<h3><span class="n">5.1</span>In the order they were run</h3>
+<p>Every command that called Docker, taken from the captured terminal logs. Pipes into <code>grep</code>/<code>tail</code> that only
+trimmed the output for the screenshots have been removed.</p>
+<pre>{{COMMANDS}}</pre>
+
+<h3><span class="n">5.2</span>Unique commands and their purpose</h3>
+<table>
+  <thead><tr><th style="width:43%">Command</th><th>Purpose</th></tr></thead>
+  <tbody>
+{{UNIQUE}}
+  </tbody>
+</table>
+
+<h2><span class="n">6</span>What I learnt</h2>
+<ul>
+  <li><b>Layer order decides how fast a rebuild is.</b> Copying <code>requirements.txt</code> and installing it before
+    copying the source means that a code change rebuilds in seconds. Error 10 showed the reverse: one stage built on
+    top of another inherits every cache invalidation of its parent. Stages should depend on as little as possible.</li>
+  <li><b>Multi-stage builds separate build tools from what ships.</b> The runtime image has the venv and the app but
+    not pip's cache, and the test tooling lives in a target that is never deployed. One Dockerfile produces both
+    images.</li>
+  <li><b>Exec-form <code>CMD</code> matters for shutdown.</b> With shell form, <code>/bin/sh</code> is PID&nbsp;1 and signals
+    may not reach the app. Moving configuration into a file read from the environment kept the command static and
+    made a stop take 0.9&nbsp;s instead of 10&nbsp;s.</li>
+  <li><b><code>depends_on</code> alone only orders container start-up.</b> A health check plus
+    <code>condition: service_healthy</code> is what makes the gateway wait until the API can answer requests.</li>
+  <li><b>User-defined networks give service discovery for free.</b> Containers reach each other by service name through
+    Docker's DNS. Leaving a port unpublished keeps a service internal without any firewall rules.</li>
+  <li><b>An empty named volume is filled from the image the first time it is mounted.</b> That is why the nginx volume
+    held only the image's symlinks (Error 7). A volume is only useful if the process actually writes regular files into it.</li>
+  <li><b>Read error messages for what actually failed.</b> "No matching distribution" was a network outage, not a
+    version conflict. Testing the same request from the host and from a throwaway container isolated the cause in
+    two commands.</li>
+  <li><b>On Windows, Docker runs Linux containers inside a WSL&nbsp;2 VM.</b> The CLI talks to it through a named pipe
+    (Error 1), and the shell can rewrite arguments before Docker sees them (Error 8).</li>
+  <li><b>Containers make the result reproducible.</b> The same test suite, and 200 random queries, gave identical answers
+    in the container and natively. Anyone with Docker can now run the whole service with one command, without
+    installing Python or nginx.</li>
+</ul>
+
+<h2 class="pb"><span class="n">A</span>Appendix: complete Docker files</h2>
+<div class="fname">Dockerfile</div>
+<pre class="listing">{{FILE:Dockerfile}}</pre>
+<div class="fname">gateway/Dockerfile</div>
+<pre class="listing">{{FILE:gateway/Dockerfile}}</pre>
+<div class="fname">gateway/default.conf.template</div>
+<pre class="listing">{{FILE:gateway/default.conf.template}}</pre>
+<div class="fname">docker-compose.yml</div>
+<pre class="listing">{{FILE:docker-compose.yml}}</pre>
+<div class="fname">gunicorn.conf.py</div>
+<pre class="listing">{{FILE:gunicorn.conf.py}}</pre>
+<div class="fname">.dockerignore</div>
+<pre class="listing">{{FILE:.dockerignore}}</pre>
+<div class="fname">.env.example</div>
+<pre class="listing">{{FILE:.env.example}}</pre>
+
+</body>
+</html>

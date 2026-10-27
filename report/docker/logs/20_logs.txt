@@ -1,0 +1,13 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose logs --tail 6 api; docker compose logs --tail 4 gateway
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.4381&long=0.6983&cat=cafe&rad=0.06&link=link.txt HTTP/1.1" 200 1794 "-" "Python-urllib/3.12"
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.63&long=0.7993&cat=hospital&rad=0.159&link=link.txt HTTP/1.1" 200 1831 "-" "Python-urllib/3.12"
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.0137&long=0.408&cat=park&rad=0.397&link=link.txt HTTP/1.1" 200 1757 "-" "Python-urllib/3.12"
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.9129&long=0.4614&cat=cafe&rad=0.277&link=link.txt HTTP/1.1" 200 1790 "-" "Python-urllib/3.12"
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.154&long=0.9327&cat=pharmacy&rad=0.228&link=link.txt HTTP/1.1" 200 1834 "-" "Python-urllib/3.12"
+api-1  | 172.21.0.3 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.2734&long=0.8347&cat=store&rad=0.135&link=link.txt HTTP/1.1" 200 1803 "-" "Python-urllib/3.12"
+gateway-1  | 172.21.0.1 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.0137&long=0.408&cat=park&rad=0.397&link=link.txt HTTP/1.1" 200 1757 "-" "Python-urllib/3.12" "-"
+gateway-1  | 172.21.0.1 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.9129&long=0.4614&cat=cafe&rad=0.277&link=link.txt HTTP/1.1" 200 1790 "-" "Python-urllib/3.12" "-"
+gateway-1  | 172.21.0.1 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.154&long=0.9327&cat=pharmacy&rad=0.228&link=link.txt HTTP/1.1" 200 1834 "-" "Python-urllib/3.12" "-"
+gateway-1  | 172.21.0.1 - - [27/Oct/2026:16:00:29 +0000] "GET /search/?lat=0.2734&long=0.8347&cat=store&rad=0.135&link=link.txt HTTP/1.1" 200 1803 "-" "Python-urllib/3.12" "-"
+[exit 0]

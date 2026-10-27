@@ -1,0 +1,8 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker images 'proximity-*'
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+IMAGE                   ID             DISK USAGE   CONTENT SIZE   EXTRA
+proximity-api:1.0       020d945d5d30        210MB           50MB   U    
+proximity-api:test      aa9cad5b0f1c        229MB         54.1MB        
+proximity-gateway:1.0   c8559d6bc06d       92.5MB           26MB   U    
+[exit 0]

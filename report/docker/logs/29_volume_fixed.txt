@@ -1,0 +1,10 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ export MSYS_NO_PATHCONV=1; docker compose exec gateway ls -l /var/log/nginx; docker compose exec gateway tail -n 3 /var/log/nginx/gateway_access.log
+total 4
+lrwxrwxrwx    1 root     root            11 Mar 24  2026 access.log -> /dev/stdout
+lrwxrwxrwx    1 root     root            11 Mar 24  2026 error.log -> /dev/stderr
+-rw-r--r--    1 root     root           429 Oct 27 16:06 gateway_access.log
+172.21.0.1 - - [27/Oct/2026:16:06:18 +0000] "GET /search/?lat=0.1&long=0.5&cat=bank&rad=0.1&link=link.txt HTTP/1.1" 200 1774 "-" "curl/8.11.0"
+172.21.0.1 - - [27/Oct/2026:16:06:18 +0000] "GET /search/?lat=0.2&long=0.5&cat=bank&rad=0.1&link=link.txt HTTP/1.1" 200 1784 "-" "curl/8.11.0"
+172.21.0.1 - - [27/Oct/2026:16:06:19 +0000] "GET /search/?lat=0.3&long=0.5&cat=bank&rad=0.1&link=link.txt HTTP/1.1" 200 1783 "-" "curl/8.11.0"
+[exit 0]

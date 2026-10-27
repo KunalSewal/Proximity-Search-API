@@ -1,0 +1,13 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose down
+ Container proximity-search-gateway-1  Stopping
+ Container proximity-search-gateway-1  Stopped
+ Container proximity-search-gateway-1  Removing
+ Container proximity-search-gateway-1  Removed
+ Container proximity-search-api-1  Stopping
+ Container proximity-search-api-1  Stopped
+ Container proximity-search-api-1  Removing
+ Container proximity-search-api-1  Removed
+ Network proximity-search_proxnet  Removing
+ Network proximity-search_proxnet  Removed
+[exit 0]

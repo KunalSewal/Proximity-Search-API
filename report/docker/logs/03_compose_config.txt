@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose config --quiet && echo 'compose file is valid' && docker compose config --services
+compose file is valid
+api
+gateway
+[exit 0]

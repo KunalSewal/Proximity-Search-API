@@ -1,0 +1,13 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ wsl --version; wsl -l -v
+WSL version: 2.6.2.0
+Kernel version: 6.6.87.2-1
+WSLg version: 1.0.71
+MSRDC version: 1.2.6353
+Direct3D version: 1.611.1-81528511
+DXCore version: 10.0.26100.1-240331-1435.ge-release
+Windows version: 10.0.26300.9711
+  NAME              STATE           VERSION
+* Ubuntu            Running         2
+  docker-desktop    Running         2
+[exit 0]

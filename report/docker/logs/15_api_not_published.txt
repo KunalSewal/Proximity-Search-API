@@ -1,0 +1,4 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ curl -s -m 3 http://localhost:8000/health || echo 'port 8000 is not reachable from the host (api is internal only)'
+port 8000 is not reachable from the host (api is internal only)
+[exit 0]

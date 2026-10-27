@@ -1,0 +1,19 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ echo '# cache test' >> engine.py && time docker build --progress=plain --target test -t proximity-api:test . 2>&1 | grep -E '^#[0-9]+ (\[(builder 4|testdeps|runtime 5|test )|CACHED|DONE)' | grep -B1 -E 'CACHED|DONE' | grep -vE '^--' | grep -A1 -E 'builder 4|testdeps|runtime 5|test '
+#8 [builder 4/4] RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+#8 CACHED
+#9 [testdeps 1/1] RUN --mount=type=cache,target=/root/.cache/pip pip install pytest
+#9 CACHED
+--
+#13 [runtime 5/7] COPY app.py engine.py gunicorn.conf.py ./
+#13 DONE 0.0s
+--
+#16 [test 1/2] COPY --from=testdeps /opt/venv /opt/venv
+#16 DONE 0.3s
+#17 [test 2/2] COPY tests/ tests/
+#17 DONE 0.1s
+
+real	0m2.346s
+user	0m0.060s
+sys	0m0.090s
+[exit 0]

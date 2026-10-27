@@ -1,0 +1,18 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ U=https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl
+$ curl -s -o /dev/null -m 120 -w "%{http_code} %{size_download} B in %{time_total}s\n" "$U"      # on the Windows host
+200 386536 B in 0.506152s
+$ docker run --rm python:3.12-slim python -c "$P" "$U"                       # P = fetch URL with urllib, timeout 60 s
+  FAILED The read operation timed out 66.7s
+$ docker run --rm python:3.12-slim python -c "$P" "$U"
+  386536 B in 44.1s
+$ docker network create --opt com.docker.network.driver.mtu=1400 mtu1400
+$ docker run --rm --network mtu1400 python:3.12-slim python -c "$P" "$U"
+  386536 B in 65.1s
+$ docker run --rm --network mtu1400 python:3.12-slim python -c "$P" "$U"
+  386536 B in 55.6s
+$ docker run --rm --network host python:3.12-slim python -c "$P" "$U"
+  FAILED The read operation timed out 72.0s
+$ docker run --rm --network host python:3.12-slim python -c "$P" "$U"
+  FAILED <urlopen error _ssl.c:994: The handshake operation timed out> 64.9s
+$ docker network rm mtu1400

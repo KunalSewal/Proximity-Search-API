@@ -1,0 +1,11 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ reg query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker Desktop' /v DisplayVersion; reg query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker Desktop' /v InstallLocation
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker Desktop
+    DisplayVersion    REG_SZ    4.54.0
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker Desktop
+    InstallLocation    REG_SZ    C:\Program Files\Docker\Docker
+
+[exit 0]

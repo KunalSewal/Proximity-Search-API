@@ -1,0 +1,4 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ curl -s 'http://localhost:8080/search/?lat=0.33&long=0.71&cat=park&rad=0.05&link=http://gateway/files/link.txt' | python -c "import json,sys; d=json.load(sys.stdin); print(d['ids'], d['meta']['link_source'], d['meta']['edges'])"
+[3371, 3271, 3272, 3373, 3573, 3569, 3669, 3173, 3072, 3474] url 14800
+[exit 0]

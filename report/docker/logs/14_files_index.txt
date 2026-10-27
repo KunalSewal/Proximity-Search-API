@@ -1,0 +1,12 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ curl -s http://localhost:8080/files/
+<html>
+<head><title>Index of /files/</title></head>
+<body>
+<h1>Index of /files/</h1><hr><pre><a href="../">../</a>
+<a href="full_grid.txt">full_grid.txt</a>                                      09-Oct-2026 16:21              732600
+<a href="link.txt">link.txt</a>                                           09-Oct-2026 16:21              532800
+<a href="sample_links.txt">sample_links.txt</a>                                   09-Oct-2026 16:21              549931
+</pre><hr></body>
+</html>
+[exit 0]

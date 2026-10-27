@@ -1,0 +1,5 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker run --rm proximity-api:test
+.......................                                                  [100%]
+23 passed in 3.34s
+[exit 0]

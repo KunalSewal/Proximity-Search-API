@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.PIDs}}' $(docker compose ps -q)
+NAME                         CPU %     MEM USAGE / LIMIT     NET I/O           PIDS
+proximity-search-api-1       0.07%     164.8MiB / 7.616GiB   3.21kB / 7.18kB   7
+proximity-search-gateway-1   0.00%     15.47MiB / 7.616GiB   9.66kB / 8.66kB   21
+[exit 0]

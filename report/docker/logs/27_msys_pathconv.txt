@@ -1,0 +1,6 @@
+kunal@KS_Predator MINGW64 ~/Desktop/CSD/Proximity Search API
+$ docker compose exec gateway ls -l /var/log/nginx; docker compose exec gateway tail -n 3 /var/log/nginx/gateway_access.log
+ls: C:/Program Files/Git/var/log/nginx: No such file or directory
+tail: can't open 'C:/Program Files/Git/var/log/nginx/gateway_access.log': No such file or directory
+tail: no files
+[exit 1]
