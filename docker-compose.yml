@@ -1,0 +1,54 @@
+# Full stack:  docker compose up -d --build
+#   gateway (nginx)  -> published on http://localhost:${HOST_PORT:-8080}
+#   api (gunicorn)   -> reachable only inside the "proxnet" network as api:8000
+# Settings come from .env (see .env.example); every one has a default here.
+
+name: proximity-search
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: proximity-api:1.0
+    restart: unless-stopped
+    environment:
+      PORT: 8000
+      WORKERS: ${API_WORKERS:-4}
+      THREADS: ${API_THREADS:-2}
+      LOCATIONS_CSV: /app/data/locations.csv
+      LINKS_DIR: /app/links
+    volumes:
+      - ./links:/app/links:ro
+    expose:
+      - "8000"
+    networks:
+      - proxnet
+
+  gateway:
+    build:
+      context: ./gateway
+    image: proximity-gateway:1.0
+    restart: unless-stopped
+    environment:
+      API_HOST: api
+      API_PORT: 8000
+      MAX_UPLOAD: ${MAX_UPLOAD:-64m}
+    ports:
+      - "${HOST_PORT:-8080}:80"
+    volumes:
+      - ./links:/srv/links:ro
+      - gateway-logs:/var/log/nginx
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - proxnet
+
+networks:
+  proxnet:
+    driver: bridge
+
+volumes:
+  gateway-logs:

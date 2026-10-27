@@ -1,0 +1,20 @@
+.git
+.gitignore
+.gitattributes
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.env
+report
+tools
+gateway
+docker-compose.yml
+Dockerfile
+.dockerignore
+README.md
+start.sh
+# loose copies of the assignment files in the repo root
+/locations.csv
+/link.txt
+/Problem.txt

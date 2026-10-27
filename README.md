@@ -101,7 +101,25 @@ tests/               correctness tests (Floyd-Warshall / exhaustive-Dijkstra ref
 start.sh             create venv, install deps, run gunicorn
 ```
 
-## Running
+## Running with Docker
+
+```bash
+cp .env.example .env          # optional: change HOST_PORT, API_WORKERS, ...
+docker compose up -d --build  # builds both images and starts the stack
+curl http://localhost:8080/health
+docker compose down           # stop and remove containers + network (log volume is kept)
+```
+
+| service   | image                          | role                                                        | port              |
+|-----------|--------------------------------|-------------------------------------------------------------|-------------------|
+| `gateway` | `nginx:1.28-alpine` (`gateway/Dockerfile`) | reverse proxy, 64 MB upload limit, serves `links/` at `/files/` | host `8080` → `80` |
+| `api`     | `python:3.12-slim` (`Dockerfile`) | gunicorn + Flask app, non-root user                      | `8000`, internal only |
+
+Both sit on the `proxnet` bridge network, so a link file can also be passed by URL from
+inside the stack: `link=http://gateway/files/link.txt`.
+Tests run in a container with `docker build --target test -t proximity-api:test . && docker run --rm proximity-api:test`.
+
+## Running without Docker
 
 ```bash
 ./start.sh                  # gunicorn on 0.0.0.0:8000

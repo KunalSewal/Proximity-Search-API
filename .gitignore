@@ -5,3 +5,4 @@ __pycache__/
 /locations.csv
 /Problem.txt
 /link.txt
+.env
